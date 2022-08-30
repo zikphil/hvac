@@ -17,7 +17,7 @@ class Kubernetes(VaultApiBase):
     Reference: https://www.vaultproject.io/api/auth/kubernetes/index.html
     """
 
-    def configure(
+    async def configure(
         self,
         kubernetes_host,
         kubernetes_ca_cert=None,
@@ -51,7 +51,7 @@ class Kubernetes(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the configure_method request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         list_of_pem_params = {
             "kubernetes_ca_cert": kubernetes_ca_cert,
@@ -80,12 +80,12 @@ class Kubernetes(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config", mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_config(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_config(self, mount_point=DEFAULT_MOUNT_POINT):
         """Return the previously configured config, including credentials.
 
         Supported methods:
@@ -99,12 +99,12 @@ class Kubernetes(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config", mount_point=mount_point
         )
-        response = self._adapter.get(
+        response = await self._adapter.get(
             url=api_path,
         )
         return response.get("data")
 
-    def create_role(
+    async def create_role(
         self,
         name,
         bound_service_account_names,
@@ -151,7 +151,7 @@ class Kubernetes(VaultApiBase):
         :param mount_point: The "path" the azure auth method was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         list_of_strings_params = {
             "bound_service_account_names": bound_service_account_names,
@@ -190,12 +190,12 @@ class Kubernetes(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/role/{name}", mount_point=mount_point, name=name
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Returns the previously registered role configuration.
 
         Supported methods:
@@ -213,12 +213,12 @@ class Kubernetes(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        response = self._adapter.get(
+        response = await self._adapter.get(
             url=api_path,
         )
         return response.get("data")
 
-    def list_roles(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_roles(self, mount_point=DEFAULT_MOUNT_POINT):
         """List all the roles that are registered with the plugin.
 
         Supported methods:
@@ -232,12 +232,12 @@ class Kubernetes(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/role", mount_point=mount_point
         )
-        response = self._adapter.list(
+        response = await self._adapter.list(
             url=api_path,
         )
         return response.get("data")
 
-    def delete_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Delete the previously registered role.
 
         Supported methods:
@@ -249,18 +249,18 @@ class Kubernetes(VaultApiBase):
         :param mount_point: The "path" the kubernetes auth method was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/role/{name}",
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def login(self, role, jwt, use_token=True, mount_point=DEFAULT_MOUNT_POINT):
+    async def login(self, role, jwt, use_token=True, mount_point=DEFAULT_MOUNT_POINT):
         """Fetch a token.
 
         This endpoint takes a signed JSON Web Token (JWT) and a role name for some entity. It verifies the JWT signature
@@ -289,7 +289,7 @@ class Kubernetes(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/login", mount_point=mount_point
         )
-        response = self._adapter.login(
+        response = await self._adapter.login(
             url=api_path,
             use_token=use_token,
             json=params,

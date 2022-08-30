@@ -17,7 +17,7 @@ class Aws(VaultApiBase):
     Reference: https://www.vaultproject.io/api/secret/aws/index.html
     """
 
-    def configure_root_iam_credentials(
+    async def configure_root_iam_credentials(
         self,
         access_key,
         secret_key,
@@ -62,7 +62,7 @@ class Aws(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "access_key": access_key,
@@ -81,12 +81,12 @@ class Aws(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/config/root", mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def rotate_root_iam_credentials(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def rotate_root_iam_credentials(self, mount_point=DEFAULT_MOUNT_POINT):
         """Rotate static root IAM credentials.
 
         When you have configured Vault with static credentials, you can use this endpoint to have Vault rotate the
@@ -106,11 +106,11 @@ class Aws(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/config/rotate-root", mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
         )
 
-    def configure_lease(self, lease, lease_max, mount_point=DEFAULT_MOUNT_POINT):
+    async def configure_lease(self, lease, lease_max, mount_point=DEFAULT_MOUNT_POINT):
         """Configure lease settings for the AWS secrets engine.
 
         It is optional, as there are default values for lease and lease_max.
@@ -127,7 +127,7 @@ class Aws(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "lease": lease,
@@ -136,12 +136,12 @@ class Aws(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/config/lease", mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_lease_config(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_lease_config(self, mount_point=DEFAULT_MOUNT_POINT):
         """Read the current lease settings for the AWS secrets engine.
 
         Supported methods:
@@ -155,11 +155,11 @@ class Aws(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/config/lease", mount_point=mount_point
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def create_or_update_role(
+    async def create_or_update_role(
         self,
         name,
         credential_type,
@@ -214,7 +214,7 @@ class Aws(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         if credential_type not in ALLOWED_CREDS_TYPES:
             error_msg = 'invalid credential_type argument provided "{arg}", supported types: "{allowed_types}"'
@@ -254,12 +254,12 @@ class Aws(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Query an existing role by the given name.
 
         If the role does not exist, a 404 is returned.
@@ -279,11 +279,11 @@ class Aws(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def list_roles(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_roles(self, mount_point=DEFAULT_MOUNT_POINT):
         """List all existing roles in the secrets engine.
 
         Supported methods:
@@ -295,11 +295,11 @@ class Aws(VaultApiBase):
         :rtype: dict
         """
         api_path = utils.format_url("/v1/{mount_point}/roles", mount_point=mount_point)
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def delete_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Delete an existing role by the given name.
 
         If the role does not exist, a 404 is returned.
@@ -313,18 +313,18 @@ class Aws(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/roles/{name}",
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def generate_credentials(
+    async def generate_credentials(
         self,
         name,
         role_arn=None,
@@ -390,12 +390,12 @@ class Aws(VaultApiBase):
         )
 
         if endpoint == "sts":
-            return self._adapter.put(
+            return await self._adapter.put(
                 url=api_path,
                 params=params,
             )
         else:
-            return self._adapter.get(
+            return await self._adapter.get(
                 url=api_path,
                 params=params,
             )

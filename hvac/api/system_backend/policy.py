@@ -5,7 +5,7 @@ from hvac.api.system_backend.system_backend_mixin import SystemBackendMixin
 
 
 class Policy(SystemBackendMixin):
-    def list_policies(self):
+    async def list_policies(self):
         """List all configured policies.
 
         Supported methods:
@@ -15,11 +15,11 @@ class Policy(SystemBackendMixin):
         :rtype: dict
         """
         api_path = "/v1/sys/policy"
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def read_policy(self, name):
+    async def read_policy(self, name):
         """Retrieve the policy body for the named policy.
 
         Supported methods:
@@ -31,11 +31,11 @@ class Policy(SystemBackendMixin):
         :rtype: dict
         """
         api_path = utils.format_url("/v1/sys/policy/{name}", name=name)
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def create_or_update_policy(self, name, policy, pretty_print=True):
+    async def create_or_update_policy(self, name, policy, pretty_print=True):
         """Add a new or update an existing policy.
 
         Once a policy is updated, it takes effect immediately to all associated users.
@@ -62,12 +62,12 @@ class Policy(SystemBackendMixin):
             "policy": policy,
         }
         api_path = utils.format_url("/v1/sys/policy/{name}", name=name)
-        return self._adapter.put(
+        return await self._adapter.put(
             url=api_path,
             json=params,
         )
 
-    def delete_policy(self, name):
+    async def delete_policy(self, name):
         """Delete the policy with the given name.
 
         This will immediately affect all users associated with this policy.
@@ -81,6 +81,6 @@ class Policy(SystemBackendMixin):
         :rtype: requests.Response
         """
         api_path = utils.format_url("/v1/sys/policy/{name}", name=name)
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )

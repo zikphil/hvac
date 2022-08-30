@@ -12,7 +12,7 @@ class Transform(VaultApiBase):
     Reference: https://www.vaultproject.io/api-docs/secret/transform
     """
 
-    def create_or_update_role(
+    async def create_or_update_role(
         self, name, transformations, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Creates or update the role with the given name.
@@ -31,7 +31,7 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the secrets engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the create_or_update_role request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "transformations": transformations,
@@ -40,12 +40,12 @@ class Transform(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Query an existing role by the given name.
 
         Supported methods:
@@ -56,17 +56,17 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the secrets engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the read_role request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = "/v1/{mount_point}/role/{name}".format(
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def list_roles(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_roles(self, mount_point=DEFAULT_MOUNT_POINT):
         """List all existing roles in the secrets engine.
 
         Supported methods:
@@ -75,14 +75,14 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the secrets engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the list_roles request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = f"/v1/{mount_point}/role"
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def delete_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Delete an existing role by the given name.
 
         Supported methods:
@@ -93,17 +93,17 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the secrets engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the delete_role request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = "/v1/{mount_point}/role/{name}".format(
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def create_or_update_transformation(
+    async def create_or_update_transformation(
         self,
         name,
         transform_type,
@@ -144,7 +144,7 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the secrets engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the create_or_update_ation request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "type": transform_type,
@@ -163,12 +163,12 @@ class Transform(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def create_or_update_fpe_transformation(
+    async def create_or_update_fpe_transformation(
         self,
         name,
         template,
@@ -201,7 +201,7 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the create_or_update_fpe_transformation request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -214,12 +214,12 @@ class Transform(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def create_or_update_masking_transformation(
+    async def create_or_update_masking_transformation(
         self,
         name,
         template,
@@ -252,7 +252,7 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the create_or_update_masking_transformation request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -265,12 +265,12 @@ class Transform(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def create_or_update_tokenization_transformation(
+    async def create_or_update_tokenization_transformation(
         self,
         name,
         max_ttl=0,
@@ -305,7 +305,7 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the create_or_update_tokenization_transformation request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         if stores is None:
             stores = ["builtin/internal"]
@@ -321,12 +321,12 @@ class Transform(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_transformation(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_transformation(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Query an existing transformation by the given name.
 
         Supported methods:
@@ -337,17 +337,17 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the secrets engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the read_ation request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = "/v1/{mount_point}/transformation/{name}".format(
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def list_transformations(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_transformations(self, mount_point=DEFAULT_MOUNT_POINT):
         """List all existing transformations in the secrets engine.
 
         Supported methods:
@@ -356,14 +356,14 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the secrets engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the list_ation request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = f"/v1/{mount_point}/transformation"
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def delete_transformation(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_transformation(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Delete an existing transformation by the given name.
 
         Supported methods:
@@ -375,17 +375,17 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the secrets engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the delete_ation request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = "/v1/{mount_point}/transformation/{name}".format(
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def create_or_update_template(
+    async def create_or_update_template(
         self, name, template_type, pattern, alphabet, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Creates or update a template with the given name.
@@ -412,7 +412,7 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the secrets engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the create_or_update_template request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "type": template_type,
@@ -423,12 +423,12 @@ class Transform(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_template(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_template(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Query an existing template by the given name.
 
         Supported methods:
@@ -439,17 +439,17 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the secrets engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the read_template request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = "/v1/{mount_point}/template/{name}".format(
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def list_templates(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_templates(self, mount_point=DEFAULT_MOUNT_POINT):
         """List all existing templates in the secrets engine.
 
         Supported methods:
@@ -458,14 +458,14 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the secrets engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the list_template request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = f"/v1/{mount_point}/template"
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def delete_template(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_template(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Delete an existing template by the given name.
 
         Supported methods:
@@ -477,7 +477,7 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the secrets engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the delete_template request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "name": name,
@@ -486,12 +486,12 @@ class Transform(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
             json=params,
         )
 
-    def create_or_update_alphabet(
+    async def create_or_update_alphabet(
         self, name, alphabet, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Create or update an alphabet with the given name.
@@ -510,7 +510,7 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the secrets engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the create_or_update_alphabet request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "alphabet": alphabet,
@@ -519,12 +519,12 @@ class Transform(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_alphabet(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_alphabet(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Queries an existing alphabet by the given name.
 
         Supported methods:
@@ -536,17 +536,17 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the secrets engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the read_alphabet request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = "/v1/{mount_point}/alphabet/{name}".format(
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def list_alphabets(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_alphabets(self, mount_point=DEFAULT_MOUNT_POINT):
         """List all existing alphabets in the secrets engine.
 
         Supported methods:
@@ -555,14 +555,14 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the secrets engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the list_alphabets request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = f"/v1/{mount_point}/alphabet"
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def delete_alphabet(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_alphabet(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Delete an existing alphabet by the given name.
 
         Supported methods:
@@ -573,17 +573,17 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the secrets engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the delete_alphabet request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = "/v1/{mount_point}/alphabet/{name}".format(
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def create_or_update_tokenization_store(
+    async def create_or_update_tokenization_store(
         self,
         name,
         driver,
@@ -632,7 +632,7 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the create_or_update_tokenization_store request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         if supported_transformations is None:
             supported_transformations = ["tokenization"]
@@ -654,12 +654,12 @@ class Transform(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def encode(
+    async def encode(
         self,
         role_name,
         value=None,
@@ -693,7 +693,7 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the secrets engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the encode request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -707,12 +707,12 @@ class Transform(VaultApiBase):
             mount_point=mount_point,
             role_name=role_name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def decode(
+    async def decode(
         self,
         role_name,
         value=None,
@@ -746,7 +746,7 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the secrets engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the decode request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -760,12 +760,12 @@ class Transform(VaultApiBase):
             mount_point=mount_point,
             role_name=role_name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def validate_token(
+    async def validate_token(
         self,
         role_name,
         value,
@@ -798,7 +798,7 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the validate_token request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -811,12 +811,12 @@ class Transform(VaultApiBase):
             mount_point=mount_point,
             role_name=role_name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def check_tokenization(
+    async def check_tokenization(
         self,
         role_name,
         value,
@@ -851,7 +851,7 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the check_tokenization request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -864,12 +864,12 @@ class Transform(VaultApiBase):
             mount_point=mount_point,
             role_name=role_name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def retrieve_token_metadata(
+    async def retrieve_token_metadata(
         self,
         role_name,
         value,
@@ -903,7 +903,7 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the retrieve_token_metadata request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -916,12 +916,12 @@ class Transform(VaultApiBase):
             mount_point=mount_point,
             role_name=role_name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def snapshot_tokenization_state(
+    async def snapshot_tokenization_state(
         self, name, limit=1000, continuation="", mount_point=DEFAULT_MOUNT_POINT
     ):
         """
@@ -946,7 +946,7 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the snapshot_tokenization_state request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -960,12 +960,12 @@ class Transform(VaultApiBase):
                 name=name,
             )
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def restore_tokenization_state(self, name, values, mount_point=DEFAULT_MOUNT_POINT):
+    async def restore_tokenization_state(self, name, values, mount_point=DEFAULT_MOUNT_POINT):
         """
         This endpoint restores previously snapshotted tokenization state values
         to the underlying store(s) of a tokenization transform.  Calls to this
@@ -983,7 +983,7 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the restore_tokenization_state request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "values": values,
@@ -994,12 +994,12 @@ class Transform(VaultApiBase):
                 name=name,
             )
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def export_decoded_tokenization_state(
+    async def export_decoded_tokenization_state(
         self, name, limit=1000, continuation="", mount_point=DEFAULT_MOUNT_POINT
     ):
         """Start or continue retrieving an export of tokenization state, including the tokens and their decoded values.
@@ -1021,7 +1021,7 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the export_decoded_tokenization_state request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -1033,12 +1033,12 @@ class Transform(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def rotate_tokenization_key(self, transform_name, mount_point=DEFAULT_MOUNT_POINT):
+    async def rotate_tokenization_key(self, transform_name, mount_point=DEFAULT_MOUNT_POINT):
         """Rotate the version of the named key.
         After rotation, new requests will be encoded with the new version of the key.
 
@@ -1052,17 +1052,17 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the rotate_tokenization_key request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = "/v1/{mount_point}/tokenization/keys/{transform_name}/rotate".format(
             mount_point=mount_point,
             transform_name=transform_name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
         )
 
-    def update_tokenization_key_config(
+    async def update_tokenization_key_config(
         self, transform_name, min_decryption_version, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Allow the minimum key version to be set for decode operations.
@@ -1081,7 +1081,7 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the update_tokenization_key_config request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "transform_name": transform_name,
@@ -1091,12 +1091,12 @@ class Transform(VaultApiBase):
             mount_point=mount_point,
             transform_name=transform_name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def list_tokenization_key_configuration(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_tokenization_key_configuration(self, mount_point=DEFAULT_MOUNT_POINT):
         """List all tokenization keys.
         Only valid for tokenization transformations.
 
@@ -1106,16 +1106,16 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the list_tokenization_key_configuration request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = "/v1/{mount_point}/tokenization/keys/".format(
             mount_point=mount_point,
         )
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def read_tokenization_key_configuration(
+    async def read_tokenization_key_configuration(
         self, transform_name, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Read tokenization key configuration for a particular transform.
@@ -1131,17 +1131,17 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the read_tokenization_key_configuration request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = "/v1/{mount_point}/tokenization/keys/{transform_name}".format(
             mount_point=mount_point,
             transform_name=transform_name,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def trim_tokenization_key_version(
+    async def trim_tokenization_key_version(
         self, transform_name, min_available_version, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Trim older key versions setting a minimum version for the keyring.
@@ -1159,7 +1159,7 @@ class Transform(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the trim_tokenization_key_version request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "min_available_version": min_available_version,
@@ -1168,7 +1168,7 @@ class Transform(VaultApiBase):
             mount_point=mount_point,
             transform_name=transform_name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )

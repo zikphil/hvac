@@ -6,7 +6,7 @@ from hvac import exceptions, utils
 
 
 class Auth(SystemBackendMixin):
-    def list_auth_methods(self):
+    async def list_auth_methods(self):
         """List all enabled auth methods.
 
         Supported methods:
@@ -16,11 +16,11 @@ class Auth(SystemBackendMixin):
         :rtype: dict
         """
         api_path = "/v1/sys/auth"
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def enable_auth_method(
+    async def enable_auth_method(
         self,
         method_type,
         description=None,
@@ -87,9 +87,9 @@ class Auth(SystemBackendMixin):
         )
         params.update(kwargs)
         api_path = utils.format_url("/v1/sys/auth/{path}", path=path)
-        return self._adapter.post(url=api_path, json=params)
+        return await self._adapter.post(url=api_path, json=params)
 
-    def disable_auth_method(self, path):
+    async def disable_auth_method(self, path):
         """Disable the auth method at the given auth path.
 
         Supported methods:
@@ -102,11 +102,11 @@ class Auth(SystemBackendMixin):
         :rtype: requests.Response
         """
         api_path = utils.format_url("/v1/sys/auth/{path}", path=path)
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def read_auth_method_tuning(self, path):
+    async def read_auth_method_tuning(self, path):
         """Read the given auth path's configuration.
 
         This endpoint requires sudo capability on the final path, but the same functionality can be achieved without
@@ -125,11 +125,11 @@ class Auth(SystemBackendMixin):
             "/v1/sys/auth/{path}/tune",
             path=path,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def tune_auth_method(
+    async def tune_auth_method(
         self,
         path,
         default_lease_ttl=None,
@@ -206,7 +206,7 @@ class Auth(SystemBackendMixin):
                     params[optional_parameter] = locals().get(optional_parameter)
         params.update(kwargs)
         api_path = utils.format_url("/v1/sys/auth/{path}/tune", path=path)
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )

@@ -12,7 +12,7 @@ class Consul(VaultApiBase):
     Reference: https://www.vaultproject.io/api/secret/consul/index.html
     """
 
-    def configure_access(
+    async def configure_access(
         self, address, token, scheme=None, mount_point=DEFAULT_MOUNT_POINT
     ):
         """This endpoint configures the access information for Consul.
@@ -27,7 +27,7 @@ class Consul(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: consul).
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "address": address,
@@ -42,12 +42,12 @@ class Consul(VaultApiBase):
         )
 
         api_path = utils.format_url("/v1/{}/config/access", mount_point)
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def create_or_update_role(
+    async def create_or_update_role(
         self,
         name,
         policy=None,
@@ -88,7 +88,7 @@ class Consul(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: consul).
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url("/v1/{}/roles/{}", mount_point, name)
 
@@ -103,12 +103,12 @@ class Consul(VaultApiBase):
             }
         )
 
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint queries for information about a Consul role with the given name.
         If no role exists with that name, a 404 is returned.
 
@@ -117,28 +117,28 @@ class Consul(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: consul).
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
 
         api_path = utils.format_url("/v1/{}/roles/{}", mount_point, name)
 
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def list_roles(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_roles(self, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint lists all existing roles in the secrets engine.
 
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
 
         api_path = utils.format_url("/v1/{}/roles", mount_point)
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def delete_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint deletes a Consul role with the given name.
         Even if the role does not exist, this endpoint will still return a successful response.
 
@@ -147,14 +147,14 @@ class Consul(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: consul).
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url("/v1/{}/roles/{}", mount_point, name)
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def generate_credentials(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def generate_credentials(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint generates a dynamic Consul token based on the given role definition.
 
         :param name: Specifies the name of an existing role against which to create this Consul credential.
@@ -162,10 +162,10 @@ class Consul(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: consul).
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url("/v1/{}/creds/{}", mount_point, name)
 
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )

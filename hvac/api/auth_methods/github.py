@@ -12,7 +12,7 @@ class Github(VaultApiBase):
     Reference: https://www.vaultproject.io/api/auth/github/index.html
     """
 
-    def configure(
+    async def configure(
         self,
         organization,
         base_url=None,
@@ -41,7 +41,7 @@ class Github(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the configure_method request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "organization": organization,
@@ -59,12 +59,12 @@ class Github(VaultApiBase):
             "/v1/auth/{mount_point}/config",
             mount_point=mount_point,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_configuration(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_configuration(self, mount_point=DEFAULT_MOUNT_POINT):
         """Read the GitHub configuration.
 
         Supported methods:
@@ -80,9 +80,9 @@ class Github(VaultApiBase):
             "/v1/auth/{mount_point}/config",
             mount_point=mount_point,
         )
-        return self._adapter.get(url=api_path)
+        return await self._adapter.get(url=api_path)
 
-    def map_team(self, team_name, policies=None, mount_point=DEFAULT_MOUNT_POINT):
+    async def map_team(self, team_name, policies=None, mount_point=DEFAULT_MOUNT_POINT):
         """Map a list of policies to a team that exists in the configured GitHub organization.
 
         Supported methods:
@@ -96,7 +96,7 @@ class Github(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the map_github_teams request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         # First, perform parameter validation.
         if policies is None:
@@ -120,12 +120,12 @@ class Github(VaultApiBase):
             mount_point=mount_point,
             team_name=team_name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_team_mapping(self, team_name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_team_mapping(self, team_name, mount_point=DEFAULT_MOUNT_POINT):
         """Read the GitHub team policy mapping.
 
         Supported methods:
@@ -144,9 +144,9 @@ class Github(VaultApiBase):
             mount_point=mount_point,
             team_name=team_name,
         )
-        return self._adapter.get(url=api_path)
+        return await self._adapter.get(url=api_path)
 
-    def map_user(self, user_name, policies=None, mount_point=DEFAULT_MOUNT_POINT):
+    async def map_user(self, user_name, policies=None, mount_point=DEFAULT_MOUNT_POINT):
         """Map a list of policies to a specific GitHub user exists in the configured organization.
 
         Supported methods:
@@ -160,7 +160,7 @@ class Github(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the map_github_users request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         # First, perform parameter validation.
         if policies is None:
@@ -185,12 +185,12 @@ class Github(VaultApiBase):
             mount_point=mount_point,
             user_name=user_name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_user_mapping(self, user_name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_user_mapping(self, user_name, mount_point=DEFAULT_MOUNT_POINT):
         """Read the GitHub user policy mapping.
 
         Supported methods:
@@ -209,9 +209,9 @@ class Github(VaultApiBase):
             mount_point=mount_point,
             user_name=user_name,
         )
-        return self._adapter.get(url=api_path)
+        return await self._adapter.get(url=api_path)
 
-    def login(self, token, use_token=True, mount_point=DEFAULT_MOUNT_POINT):
+    async def login(self, token, use_token=True, mount_point=DEFAULT_MOUNT_POINT):
         """Login using GitHub access token.
 
         Supported methods:
@@ -234,7 +234,7 @@ class Github(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/login", mount_point=mount_point
         )
-        return self._adapter.login(
+        return await self._adapter.login(
             url=api_path,
             use_token=use_token,
             json=params,

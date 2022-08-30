@@ -1,3 +1,3 @@
-from hvac.v1 import Client
+from hvac.v1 import AsyncClient, Client
 
-__all__ = ("Client",)
+__all__ = ("AsyncClient", "Client")

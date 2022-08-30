@@ -12,7 +12,7 @@ class ActiveDirectory(VaultApiBase):
     Reference: https://www.vaultproject.io/api/secret/ad/index.html
     """
 
-    def configure(
+    async def configure(
         self,
         binddn=None,
         bindpass=None,
@@ -48,7 +48,7 @@ class ActiveDirectory(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -65,12 +65,12 @@ class ActiveDirectory(VaultApiBase):
         params.update(kwargs)
 
         api_path = utils.format_url("/v1/{mount_point}/config", mount_point=mount_point)
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_config(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_config(self, mount_point=DEFAULT_MOUNT_POINT):
         """Read the configured shared information for the ad secrets engine.
 
         Credentials will be omitted from returned data.
@@ -84,11 +84,11 @@ class ActiveDirectory(VaultApiBase):
         :rtype: dict
         """
         api_path = utils.format_url("/v1/{mount_point}/config", mount_point=mount_point)
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def create_or_update_role(
+    async def create_or_update_role(
         self, name, service_account_name=None, ttl=None, mount_point=DEFAULT_MOUNT_POINT
     ):
         """This endpoint creates or updates the ad role definition.
@@ -105,7 +105,7 @@ class ActiveDirectory(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: ad).
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url("/v1/{}/roles/{}", mount_point, name)
         params = {
@@ -119,12 +119,12 @@ class ActiveDirectory(VaultApiBase):
                 }
             )
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint queries for information about a ad role with the given name.
         If no role exists with that name, a 404 is returned.
         :param name: Specifies the name of the role to query.
@@ -132,24 +132,24 @@ class ActiveDirectory(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: ad).
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url("/v1/{}/roles/{}", mount_point, name)
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def list_roles(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_roles(self, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint lists all existing roles in the secrets engine.
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url("/v1/{}/roles", mount_point)
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def delete_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint deletes a ad role with the given name.
         Even if the role does not exist, this endpoint will still return a successful response.
         :param name: Specifies the name of the role to delete.
@@ -157,14 +157,14 @@ class ActiveDirectory(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: ad).
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url("/v1/{}/roles/{}", mount_point, name)
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def generate_credentials(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def generate_credentials(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint retrieves the previous and current LDAP password for
            the associated account (or rotate if required)
 
@@ -173,9 +173,9 @@ class ActiveDirectory(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: ad).
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url("/v1/{}/creds/{}", mount_point, name)
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )

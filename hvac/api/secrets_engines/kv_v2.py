@@ -12,7 +12,7 @@ class KvV2(VaultApiBase):
     Reference: https://www.vaultproject.io/api/secret/kv/kv-v2.html
     """
 
-    def configure(
+    async def configure(
         self,
         max_versions=10,
         cas_required=None,
@@ -37,7 +37,7 @@ class KvV2(VaultApiBase):
             Defaults to "0s" (i.e., disabled).
         :type delete_version_after: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "max_versions": max_versions,
@@ -46,12 +46,12 @@ class KvV2(VaultApiBase):
         if cas_required is not None:
             params["cas_required"] = cas_required
         api_path = utils.format_url("/v1/{mount_point}/config", mount_point=mount_point)
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_configuration(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_configuration(self, mount_point=DEFAULT_MOUNT_POINT):
         """Read the KV Version 2 configuration.
 
         Supported methods:
@@ -67,12 +67,12 @@ class KvV2(VaultApiBase):
             "/v1/{mount_point}/config",
             mount_point=mount_point,
         )
-        return self._adapter.get(url=api_path)
+        return await self._adapter.get(url=api_path)
 
-    def read_secret(self, path, mount_point=DEFAULT_MOUNT_POINT):
-        return self.read_secret_version(path, mount_point=mount_point)
+    async def read_secret(self, path, mount_point=DEFAULT_MOUNT_POINT):
+        return await self.read_secret_version(path, mount_point=mount_point)
 
-    def read_secret_version(self, path, version=None, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_secret_version(self, path, version=None, mount_point=DEFAULT_MOUNT_POINT):
         """Retrieve the secret at the specified location.
 
         Supported methods:
@@ -94,12 +94,12 @@ class KvV2(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/data/{path}", mount_point=mount_point, path=path
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
             params=params,
         )
 
-    def create_or_update_secret(
+    async def create_or_update_secret(
         self, path, secret, cas=None, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Create a new version of a secret at the specified location.
@@ -134,12 +134,12 @@ class KvV2(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/data/{path}", mount_point=mount_point, path=path
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def patch(self, path, secret, mount_point=DEFAULT_MOUNT_POINT):
+    async def patch(self, path, secret, mount_point=DEFAULT_MOUNT_POINT):
         """Set or update data in the KV store without overwriting.
 
         :param path: Path
@@ -153,7 +153,7 @@ class KvV2(VaultApiBase):
         """
         # First, do a read.
         try:
-            current_secret_version = self.read_secret_version(
+            current_secret_version = await self.read_secret_version(
                 path=path,
                 mount_point=mount_point,
             )
@@ -169,14 +169,14 @@ class KvV2(VaultApiBase):
         patched_secret.update(secret)
 
         # Write back updated secret.
-        return self.create_or_update_secret(
+        return await self.create_or_update_secret(
             path=path,
             cas=current_secret_version["data"]["metadata"]["version"],
             secret=patched_secret,
             mount_point=mount_point,
         )
 
-    def delete_latest_version_of_secret(self, path, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_latest_version_of_secret(self, path, mount_point=DEFAULT_MOUNT_POINT):
         """Issue a soft delete of the secret's latest version at the specified location.
 
         This marks the version as deleted and will stop it from being returned from reads, but the underlying data will
@@ -191,16 +191,16 @@ class KvV2(VaultApiBase):
         :param mount_point: The "path" the secret engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/data/{path}", mount_point=mount_point, path=path
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def delete_secret_versions(self, path, versions, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_secret_versions(self, path, versions, mount_point=DEFAULT_MOUNT_POINT):
         """Issue a soft delete of the specified versions of the secret.
 
         This marks the versions as deleted and will stop them from being returned from reads,
@@ -219,7 +219,7 @@ class KvV2(VaultApiBase):
         :param mount_point: The "path" the secret engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         if not isinstance(versions, list) or len(versions) == 0:
             error_msg = 'argument to "versions" must be a list containing one or more integers, "{versions}" provided.'.format(
@@ -232,12 +232,12 @@ class KvV2(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/delete/{path}", mount_point=mount_point, path=path
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def undelete_secret_versions(self, path, versions, mount_point=DEFAULT_MOUNT_POINT):
+    async def undelete_secret_versions(self, path, versions, mount_point=DEFAULT_MOUNT_POINT):
         """Undelete the data for the provided version and path in the key-value store.
 
         This restores the data, allowing it to be returned on get requests.
@@ -254,7 +254,7 @@ class KvV2(VaultApiBase):
         :param mount_point: The "path" the secret engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         if not isinstance(versions, list) or len(versions) == 0:
             error_msg = 'argument to "versions" must be a list containing one or more integers, "{versions}" provided.'.format(
@@ -267,12 +267,12 @@ class KvV2(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/undelete/{path}", mount_point=mount_point, path=path
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def destroy_secret_versions(self, path, versions, mount_point=DEFAULT_MOUNT_POINT):
+    async def destroy_secret_versions(self, path, versions, mount_point=DEFAULT_MOUNT_POINT):
         """Permanently remove the specified version data and numbers for the provided path from the key-value store.
 
         Supported methods:
@@ -288,7 +288,7 @@ class KvV2(VaultApiBase):
         :param mount_point: The "path" the secret engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         if not isinstance(versions, list) or len(versions) == 0:
             error_msg = 'argument to "versions" must be a list containing one or more integers, "{versions}" provided.'.format(
@@ -301,12 +301,12 @@ class KvV2(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/destroy/{path}", mount_point=mount_point, path=path
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def list_secrets(self, path, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_secrets(self, path, mount_point=DEFAULT_MOUNT_POINT):
         """Return a list of key names at the specified location.
 
         Folders are suffixed with /. The input must be a folder; list on a file will not return a value. Note that no
@@ -327,11 +327,11 @@ class KvV2(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/metadata/{path}", mount_point=mount_point, path=path
         )
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def read_secret_metadata(self, path, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_secret_metadata(self, path, mount_point=DEFAULT_MOUNT_POINT):
         """Retrieve the metadata and versions for the secret at the specified path.
 
         Supported methods:
@@ -348,11 +348,11 @@ class KvV2(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/metadata/{path}", mount_point=mount_point, path=path
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def update_metadata(
+    async def update_metadata(
         self,
         path,
         max_versions=None,
@@ -381,7 +381,7 @@ class KvV2(VaultApiBase):
         :param mount_point: The "path" the secret engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "delete_version_after": delete_version_after,
@@ -400,12 +400,12 @@ class KvV2(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/metadata/{path}", mount_point=mount_point, path=path
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def delete_metadata_and_all_versions(self, path, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_metadata_and_all_versions(self, path, mount_point=DEFAULT_MOUNT_POINT):
         """Delete (permanently) the key metadata and all version data for the specified key.
 
         All version history will be removed.
@@ -419,11 +419,11 @@ class KvV2(VaultApiBase):
         :param mount_point: The "path" the secret engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/metadata/{path}", mount_point=mount_point, path=path
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )

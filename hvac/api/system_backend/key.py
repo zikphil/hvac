@@ -3,7 +3,7 @@ from hvac.exceptions import ParamValidationError
 
 
 class Key(SystemBackendMixin):
-    def read_root_generation_progress(self):
+    async def read_root_generation_progress(self):
         """Read the configuration and process of the current root generation attempt.
 
         Supported methods:
@@ -13,11 +13,11 @@ class Key(SystemBackendMixin):
         :rtype: dict
         """
         api_path = "/v1/sys/generate-root/attempt"
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def start_root_token_generation(self, otp=None, pgp_key=None):
+    async def start_root_token_generation(self, otp=None, pgp_key=None):
         """Initialize a new root generation attempt.
 
         Only a single root generation attempt can take place at a time. One (and only one) of otp or pgp_key are
@@ -46,9 +46,9 @@ class Key(SystemBackendMixin):
             params["pgp_key"] = pgp_key
 
         api_path = "/v1/sys/generate-root/attempt"
-        return self._adapter.put(url=api_path, json=params)
+        return await self._adapter.put(url=api_path, json=params)
 
-    def generate_root(self, key, nonce):
+    async def generate_root(self, key, nonce):
         """Enter a single master key share to progress the root generation attempt.
 
         If the threshold number of master key shares is reached, Vault will complete the root generation and issue the
@@ -70,12 +70,12 @@ class Key(SystemBackendMixin):
             "nonce": nonce,
         }
         api_path = "/v1/sys/generate-root/update"
-        return self._adapter.put(
+        return await self._adapter.put(
             url=api_path,
             json=params,
         )
 
-    def cancel_root_generation(self):
+    async def cancel_root_generation(self):
         """Cancel any in-progress root generation attempt.
 
         This clears any progress made. This must be called to change the OTP or PGP key being used.
@@ -87,11 +87,11 @@ class Key(SystemBackendMixin):
         :rtype: request.Response
         """
         api_path = "/v1/sys/generate-root/attempt"
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def get_encryption_key_status(self):
+    async def get_encryption_key_status(self):
         """Read information about the current encryption key used by Vault.
 
         Supported methods:
@@ -101,11 +101,11 @@ class Key(SystemBackendMixin):
         :rtype: dict
         """
         api_path = "/v1/sys/key-status"
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def rotate_encryption_key(self):
+    async def rotate_encryption_key(self):
         """Trigger a rotation of the backend encryption key.
 
         This is the key that is used to encrypt data written to the storage backend, and is not provided to operators.
@@ -121,11 +121,11 @@ class Key(SystemBackendMixin):
         :rtype: requests.Response
         """
         api_path = "/v1/sys/rotate"
-        return self._adapter.put(
+        return await self._adapter.put(
             url=api_path,
         )
 
-    def read_rekey_progress(self, recovery_key=False):
+    async def read_rekey_progress(self, recovery_key=False):
         """Read the configuration and progress of the current rekey attempt.
 
         Supported methods:
@@ -140,11 +140,11 @@ class Key(SystemBackendMixin):
         api_path = "/v1/sys/rekey/init"
         if recovery_key:
             api_path = "/v1/sys/rekey-recovery-key/init"
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def start_rekey(
+    async def start_rekey(
         self,
         secret_shares=5,
         secret_threshold=3,
@@ -206,12 +206,12 @@ class Key(SystemBackendMixin):
         api_path = "/v1/sys/rekey/init"
         if recovery_key:
             api_path = "/v1/sys/rekey-recovery-key/init"
-        return self._adapter.put(
+        return await self._adapter.put(
             url=api_path,
             json=params,
         )
 
-    def cancel_rekey(self, recovery_key=False):
+    async def cancel_rekey(self, recovery_key=False):
         """Cancel any in-progress rekey.
 
         This clears the rekey settings as well as any progress made. This must be called to change the parameters of the
@@ -232,11 +232,11 @@ class Key(SystemBackendMixin):
         api_path = "/v1/sys/rekey/init"
         if recovery_key:
             api_path = "/v1/sys/rekey-recovery-key/init"
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def rekey(self, key, nonce=None, recovery_key=False):
+    async def rekey(self, key, nonce=None, recovery_key=False):
         """Enter a single recovery key share to progress the rekey of the Vault.
 
         If the threshold number of recovery key shares is reached, Vault will complete the rekey. Otherwise, this API
@@ -266,12 +266,12 @@ class Key(SystemBackendMixin):
         api_path = "/v1/sys/rekey/update"
         if recovery_key:
             api_path = "/v1/sys/rekey-recovery-key/update"
-        return self._adapter.put(
+        return await self._adapter.put(
             url=api_path,
             json=params,
         )
 
-    def rekey_multi(self, keys, nonce=None, recovery_key=False):
+    async def rekey_multi(self, keys, nonce=None, recovery_key=False):
         """Enter multiple recovery key shares to progress the rekey of the Vault.
 
         If the threshold number of recovery key shares is reached, Vault will complete the rekey.
@@ -288,7 +288,7 @@ class Key(SystemBackendMixin):
         result = None
 
         for key in keys:
-            result = self.rekey(
+            result = await self.rekey(
                 key=key,
                 nonce=nonce,
                 recovery_key=recovery_key,
@@ -298,7 +298,7 @@ class Key(SystemBackendMixin):
 
         return result
 
-    def read_backup_keys(self, recovery_key=False):
+    async def read_backup_keys(self, recovery_key=False):
         """Retrieve the backup copy of PGP-encrypted unseal keys.
 
         The returned value is the nonce of the rekey operation and a map of PGP key fingerprint to hex-encoded
@@ -316,11 +316,11 @@ class Key(SystemBackendMixin):
         api_path = "/v1/sys/rekey/backup"
         if recovery_key:
             api_path = "/v1/sys/rekey/recovery-key-backup"
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def cancel_rekey_verify(self):
+    async def cancel_rekey_verify(self):
         """Cancel any in-progress rekey verification.
         This clears any progress made and resets the nonce. Unlike cancel_rekey, this only resets
         the current verification operation, not the entire rekey atttempt.
@@ -333,11 +333,11 @@ class Key(SystemBackendMixin):
         :rtype: requests.Response
         """
         api_path = "/v1/sys/rekey/verify"
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def rekey_verify(self, key, nonce):
+    async def rekey_verify(self, key, nonce):
         """Enter a single new recovery key share to progress the rekey verification of the Vault.
         If the threshold number of new recovery key shares is reached, Vault will complete the
         rekey. Otherwise, this API must be called multiple times until that threshold is met.
@@ -359,12 +359,12 @@ class Key(SystemBackendMixin):
         }
 
         api_path = "/v1/sys/rekey/verify"
-        return self._adapter.put(
+        return await self._adapter.put(
             url=api_path,
             json=params,
         )
 
-    def rekey_verify_multi(self, keys, nonce):
+    async def rekey_verify_multi(self, keys, nonce):
         """Enter multiple new recovery key shares to progress the rekey verification of the Vault.
         If the threshold number of new recovery key shares is reached, Vault will complete the
         rekey. Otherwise, this API must be called multiple times until that threshold is met.
@@ -383,7 +383,7 @@ class Key(SystemBackendMixin):
         result = None
 
         for key in keys:
-            result = self.rekey_verify(
+            result = await self.rekey_verify(
                 key=key,
                 nonce=nonce,
             )
@@ -392,7 +392,7 @@ class Key(SystemBackendMixin):
 
         return result
 
-    def read_rekey_verify_progress(self):
+    async def read_rekey_verify_progress(self):
         """Read the configuration and progress of the current rekey verify attempt.
 
         Supported methods:
@@ -402,6 +402,6 @@ class Key(SystemBackendMixin):
         :rtype: requests.Response
         """
         api_path = "/v1/sys/rekey/verify"
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )

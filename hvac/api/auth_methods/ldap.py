@@ -12,7 +12,7 @@ class Ldap(VaultApiBase):
     Reference: https://www.vaultproject.io/api/auth/ldap/index.html
     """
 
-    def configure(
+    async def configure(
         self,
         user_dn=None,
         group_dn=None,
@@ -101,7 +101,7 @@ class Ldap(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the configure request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -113,7 +113,6 @@ class Ldap(VaultApiBase):
                 "tls_min_version": tls_min_version,
                 "tls_max_version": tls_max_version,
                 "insecure_tls": insecure_tls,
-                "certificate": certificate,
                 "userattr": user_attr,
                 "discoverdn": discover_dn,
                 "deny_null_bind": deny_null_bind,
@@ -132,12 +131,12 @@ class Ldap(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config", mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_configuration(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_configuration(self, mount_point=DEFAULT_MOUNT_POINT):
         """
         Retrieve the LDAP configuration for the auth method.
 
@@ -152,11 +151,11 @@ class Ldap(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config", mount_point=mount_point
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def create_or_update_group(
+    async def create_or_update_group(
         self, name, policies=None, mount_point=DEFAULT_MOUNT_POINT
     ):
         """
@@ -174,7 +173,7 @@ class Ldap(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the create_or_update_group request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         if policies is not None and not isinstance(policies, list):
             error_msg = '"policies" argument must be an instance of list or None, "{policies_type}" provided.'.format(
@@ -190,12 +189,12 @@ class Ldap(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def list_groups(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_groups(self, mount_point=DEFAULT_MOUNT_POINT):
         """
         List existing LDAP existing groups that have been created in this auth method.
 
@@ -211,11 +210,11 @@ class Ldap(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/groups", mount_point=mount_point
         )
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def read_group(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_group(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """
         Read policies associated with a LDAP group.
 
@@ -238,12 +237,12 @@ class Ldap(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
             json=params,
         )
 
-    def delete_group(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_group(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """
         Delete a LDAP group and policy association.
 
@@ -256,18 +255,18 @@ class Ldap(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the delete_group request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/groups/{name}",
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def create_or_update_user(
+    async def create_or_update_user(
         self, username, policies=None, groups=None, mount_point=DEFAULT_MOUNT_POINT
     ):
         """
@@ -288,7 +287,7 @@ class Ldap(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the create_or_update_user request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         list_required_params = {
             "policies": policies,
@@ -312,12 +311,12 @@ class Ldap(VaultApiBase):
             mount_point=mount_point,
             username=username,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def list_users(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_users(self, mount_point=DEFAULT_MOUNT_POINT):
         """
         List existing users in the method.
 
@@ -333,11 +332,11 @@ class Ldap(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/users", mount_point=mount_point
         )
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def read_user(self, username, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_user(self, username, mount_point=DEFAULT_MOUNT_POINT):
         """
         Read policies associated with a LDAP user.
 
@@ -357,11 +356,11 @@ class Ldap(VaultApiBase):
             mount_point=mount_point,
             username=username,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def delete_user(self, username, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_user(self, username, mount_point=DEFAULT_MOUNT_POINT):
         """
         Delete a LDAP user and policy association.
 
@@ -374,18 +373,18 @@ class Ldap(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the delete_user request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/users/{username}",
             mount_point=mount_point,
             username=username,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def login(
+    async def login(
         self, username, password, use_token=True, mount_point=DEFAULT_MOUNT_POINT
     ):
         """
@@ -405,7 +404,7 @@ class Ldap(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the login_with_user request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "password": password,
@@ -415,7 +414,7 @@ class Ldap(VaultApiBase):
             mount_point=mount_point,
             username=username,
         )
-        return self._adapter.login(
+        return await self._adapter.login(
             url=api_path,
             use_token=use_token,
             json=params,

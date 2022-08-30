@@ -19,7 +19,7 @@ class Mfa(VaultApiBase):
     Reference: https://www.vaultproject.io/docs/auth/mfa.html
     """
 
-    def configure(self, mount_point, mfa_type="duo", force=False):
+    async def configure(self, mount_point, mfa_type="duo", force=False):
         """Configure MFA for a supported method.
 
         This endpoint allows you to turn on multi-factor authentication with a given backend.
@@ -36,7 +36,7 @@ class Mfa(VaultApiBase):
             the provided mount_point is available and one of the types of methods supported by this feature.
         :type force: bool
         :return: The response of the configure MFA request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         if mfa_type != "duo" and not force:
             # The situation described via this exception is not likely to change in the future.
@@ -55,12 +55,12 @@ class Mfa(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/mfa_config", mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_configuration(self, mount_point):
+    async def read_configuration(self, mount_point):
         """Read the MFA configuration.
 
         Supported methods:
@@ -76,9 +76,9 @@ class Mfa(VaultApiBase):
             "/v1/auth/{mount_point}/mfa_config",
             mount_point=mount_point,
         )
-        return self._adapter.get(url=api_path)
+        return await self._adapter.get(url=api_path)
 
-    def configure_duo_access(self, mount_point, host, integration_key, secret_key):
+    async def configure_duo_access(self, mount_point, host, integration_key, secret_key):
         """Configure the access keys and host for Duo API connections.
 
         To authenticate users with Duo, the backend needs to know what host to connect to and must authenticate with an
@@ -96,7 +96,7 @@ class Mfa(VaultApiBase):
         :param secret_key: The "path" the method/backend was mounted on.
         :type secret_key: str | unicode
         :return: The response of the configure_duo_access request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "host": host,
@@ -107,12 +107,12 @@ class Mfa(VaultApiBase):
             "/v1/auth/{mount_point}/duo/access",
             mount_point=mount_point,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def configure_duo_behavior(
+    async def configure_duo_behavior(
         self, mount_point, push_info=None, user_agent=None, username_format="%s"
     ):
         """Configure Duo second factor behavior.
@@ -135,7 +135,7 @@ class Mfa(VaultApiBase):
             (default '%s')
         :type username_format: str | unicode
         :return: The response of the configure_duo_behavior request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "username_format": username_format,
@@ -148,12 +148,12 @@ class Mfa(VaultApiBase):
             "/v1/auth/{mount_point}/duo/config",
             mount_point=mount_point,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_duo_behavior_configuration(self, mount_point):
+    async def read_duo_behavior_configuration(self, mount_point):
         """Read the Duo second factor behavior configuration.
 
         Supported methods:
@@ -169,4 +169,4 @@ class Mfa(VaultApiBase):
             "/v1/auth/{mount_point}/duo/config",
             mount_point=mount_point,
         )
-        return self._adapter.get(url=api_path)
+        return await self._adapter.get(url=api_path)

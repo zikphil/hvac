@@ -2,7 +2,7 @@ from hvac.api.system_backend.system_backend_mixin import SystemBackendMixin
 
 
 class Leader(SystemBackendMixin):
-    def read_leader_status(self):
+    async def read_leader_status(self):
         """Read the high availability status and current leader instance of Vault.
 
         Supported methods:
@@ -12,11 +12,11 @@ class Leader(SystemBackendMixin):
         :rtype: dict
         """
         api_path = "/v1/sys/leader"
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def step_down(self):
+    async def step_down(self):
         """Force the node to give up active status.
 
         If the node does not have active status, this endpoint does nothing.
@@ -29,6 +29,6 @@ class Leader(SystemBackendMixin):
         :rtype: dict
         """
         api_path = "/v1/sys/step-down"
-        return self._adapter.put(
+        return await self._adapter.put(
             url=api_path,
         )

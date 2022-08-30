@@ -12,7 +12,7 @@ class AppRole(VaultApiBase):
     Reference: https://www.vaultproject.io/api-docs/auth/approle/index.html
     """
 
-    def create_or_update_approle(
+    async def create_or_update_approle(
         self,
         role_name,
         bind_secret_id=None,
@@ -126,9 +126,9 @@ class AppRole(VaultApiBase):
             mount_point=mount_point,
             name=role_name,
         )
-        return self._adapter.post(url=api_path, json=params)
+        return await self._adapter.post(url=api_path, json=params)
 
-    def list_roles(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_roles(self, mount_point=DEFAULT_MOUNT_POINT):
         """
         List existing roles created in the auth method.
 
@@ -143,9 +143,9 @@ class AppRole(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/role", mount_point=mount_point
         )
-        return self._adapter.list(url=api_path)
+        return await self._adapter.list(url=api_path)
 
-    def read_role(self, role_name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_role(self, role_name, mount_point=DEFAULT_MOUNT_POINT):
         """
         Read role in the auth method.
 
@@ -164,9 +164,9 @@ class AppRole(VaultApiBase):
             mount_point=mount_point,
             role_name=role_name,
         )
-        return self._adapter.get(url=api_path)
+        return await self._adapter.get(url=api_path)
 
-    def delete_role(self, role_name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_role(self, role_name, mount_point=DEFAULT_MOUNT_POINT):
         """
         Delete role in the auth method.
 
@@ -183,9 +183,9 @@ class AppRole(VaultApiBase):
             mount_point=mount_point,
             role_name=role_name,
         )
-        return self._adapter.delete(url=api_path)
+        return await self._adapter.delete(url=api_path)
 
-    def read_role_id(self, role_name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_role_id(self, role_name, mount_point=DEFAULT_MOUNT_POINT):
         """
         Reads the Role ID of a role in the auth method.
 
@@ -204,9 +204,9 @@ class AppRole(VaultApiBase):
             mount_point=mount_point,
             role_name=role_name,
         )
-        return self._adapter.get(url=api_path)
+        return await self._adapter.get(url=api_path)
 
-    def update_role_id(self, role_name, role_id, mount_point=DEFAULT_MOUNT_POINT):
+    async def update_role_id(self, role_name, role_id, mount_point=DEFAULT_MOUNT_POINT):
         """
         Updates the Role ID of a role in the auth method.
 
@@ -229,9 +229,9 @@ class AppRole(VaultApiBase):
             mount_point=mount_point,
             role_name=role_name,
         )
-        return self._adapter.post(url=api_path, json=params)
+        return await self._adapter.post(url=api_path, json=params)
 
-    def generate_secret_id(
+    async def generate_secret_id(
         self,
         role_name,
         metadata=None,
@@ -286,9 +286,9 @@ class AppRole(VaultApiBase):
             mount_point=mount_point,
             role_name=role_name,
         )
-        return self._adapter.post(url=api_path, json=params)
+        return await self._adapter.post(url=api_path, json=params)
 
-    def create_custom_secret_id(
+    async def create_custom_secret_id(
         self,
         role_name,
         secret_id,
@@ -346,9 +346,9 @@ class AppRole(VaultApiBase):
             mount_point=mount_point,
             role_name=role_name,
         )
-        return self._adapter.post(url=api_path, json=params)
+        return await self._adapter.post(url=api_path, json=params)
 
-    def read_secret_id(self, role_name, secret_id, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_secret_id(self, role_name, secret_id, mount_point=DEFAULT_MOUNT_POINT):
         """
         Read the properties of a Secret ID for a role in the auth method.
 
@@ -370,9 +370,9 @@ class AppRole(VaultApiBase):
             mount_point=mount_point,
             role_name=role_name,
         )
-        return self._adapter.post(url=api_path, json=params)
+        return await self._adapter.post(url=api_path, json=params)
 
-    def destroy_secret_id(self, role_name, secret_id, mount_point=DEFAULT_MOUNT_POINT):
+    async def destroy_secret_id(self, role_name, secret_id, mount_point=DEFAULT_MOUNT_POINT):
         """
         Destroys a Secret ID for a role in the auth method.
 
@@ -392,9 +392,9 @@ class AppRole(VaultApiBase):
             mount_point=mount_point,
             role_name=role_name,
         )
-        return self._adapter.post(url=api_path, json=params)
+        return await self._adapter.post(url=api_path, json=params)
 
-    def list_secret_id_accessors(self, role_name, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_secret_id_accessors(self, role_name, mount_point=DEFAULT_MOUNT_POINT):
         """
         Lists accessors of all issued Secret IDs for a role in the auth method.
 
@@ -413,9 +413,9 @@ class AppRole(VaultApiBase):
             mount_point=mount_point,
             role_name=role_name,
         )
-        return self._adapter.list(url=api_path)
+        return await self._adapter.list(url=api_path)
 
-    def read_secret_id_accessor(
+    async def read_secret_id_accessor(
         self, role_name, secret_id_accessor, mount_point=DEFAULT_MOUNT_POINT
     ):
         """
@@ -439,9 +439,9 @@ class AppRole(VaultApiBase):
             mount_point=mount_point,
             role_name=role_name,
         )
-        return self._adapter.post(url=api_path, json=params)
+        return await self._adapter.post(url=api_path, json=params)
 
-    def destroy_secret_id_accessor(
+    async def destroy_secret_id_accessor(
         self, role_name, secret_id_accessor, mount_point=DEFAULT_MOUNT_POINT
     ):
         """
@@ -463,9 +463,9 @@ class AppRole(VaultApiBase):
             mount_point=mount_point,
             role_name=role_name,
         )
-        return self._adapter.post(url=api_path, json=params)
+        return await self._adapter.post(url=api_path, json=params)
 
-    def login(
+    async def login(
         self, role_id, secret_id=None, use_token=True, mount_point=DEFAULT_MOUNT_POINT
     ):
         """
@@ -490,7 +490,7 @@ class AppRole(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/login", mount_point=mount_point
         )
-        return self._adapter.login(
+        return await self._adapter.login(
             url=api_path,
             use_token=use_token,
             json=params,

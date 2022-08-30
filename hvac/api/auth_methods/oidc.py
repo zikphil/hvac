@@ -18,7 +18,7 @@ class OIDC(JWT):
 
     DEFAULT_PATH = "oidc"
 
-    def create_role(
+    async def create_role(
         self,
         name,
         user_claim,
@@ -130,7 +130,7 @@ class OIDC(JWT):
         :rtype: dict
         """
 
-        super().create_role(
+        await super().create_role(
             name=name,
             user_claim=user_claim,
             allowed_redirect_uris=allowed_redirect_uris,

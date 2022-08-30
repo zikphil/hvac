@@ -18,7 +18,7 @@ class Gcp(VaultApiBase):
     Reference: https://www.vaultproject.io/api/auth/{mount_point}/index.html
     """
 
-    def configure(
+    async def configure(
         self,
         credentials=None,
         google_certs_endpoint=GCP_CERTS_ENDPOINT,
@@ -44,7 +44,7 @@ class Gcp(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -55,12 +55,12 @@ class Gcp(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config", mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_config(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_config(self, mount_point=DEFAULT_MOUNT_POINT):
         """Read the configuration, if any, including credentials.
 
         Supported methods:
@@ -74,12 +74,12 @@ class Gcp(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config", mount_point=mount_point
         )
-        response = self._adapter.get(
+        response = await self._adapter.get(
             url=api_path,
         )
         return response.get("data")
 
-    def delete_config(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_config(self, mount_point=DEFAULT_MOUNT_POINT):
         """Delete all GCP configuration data. This operation is idempotent.
 
         Supported methods:
@@ -89,16 +89,16 @@ class Gcp(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config", mount_point=mount_point
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def create_role(
+    async def create_role(
         self,
         name,
         role_type,
@@ -176,7 +176,7 @@ class Gcp(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The data key from the JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         type_specific_params = {
             "iam": {
@@ -270,12 +270,12 @@ class Gcp(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def edit_service_accounts_on_iam_role(
+    async def edit_service_accounts_on_iam_role(
         self, name, add=None, remove=None, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Edit service accounts for an existing IAM role in the GCP auth method.
@@ -295,7 +295,7 @@ class Gcp(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -308,12 +308,12 @@ class Gcp(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def edit_labels_on_gce_role(
+    async def edit_labels_on_gce_role(
         self, name, add=None, remove=None, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Edit labels for an existing GCE role in the backend.
@@ -334,7 +334,7 @@ class Gcp(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the edit_labels_on_gce_role request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -347,12 +347,12 @@ class Gcp(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Read the previously registered role configuration.
 
         Supported methods:
@@ -374,13 +374,13 @@ class Gcp(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        response = self._adapter.get(
+        response = await self._adapter.get(
             url=api_path,
             json=params,
         )
         return response.get("data")
 
-    def list_roles(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_roles(self, mount_point=DEFAULT_MOUNT_POINT):
         """List all the roles that are registered with the plugin.
 
         Supported methods:
@@ -395,12 +395,12 @@ class Gcp(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/roles", mount_point=mount_point
         )
-        response = self._adapter.list(
+        response = await self._adapter.list(
             url=api_path,
         )
         return response.get("data")
 
-    def delete_role(self, role, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_role(self, role, mount_point=DEFAULT_MOUNT_POINT):
         """Delete the previously registered role.
 
         Supported methods:
@@ -412,7 +412,7 @@ class Gcp(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "role": role,
@@ -422,12 +422,12 @@ class Gcp(VaultApiBase):
             mount_point=mount_point,
             role=role,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
             json=params,
         )
 
-    def login(self, role, jwt, use_token=True, mount_point=DEFAULT_MOUNT_POINT):
+    async def login(self, role, jwt, use_token=True, mount_point=DEFAULT_MOUNT_POINT):
         """Login to retrieve a Vault token via the GCP auth method.
 
         This endpoint takes a signed JSON Web Token (JWT) and a role name for some entity. It verifies the JWT
@@ -456,7 +456,7 @@ class Gcp(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/login", mount_point=mount_point
         )
-        return self._adapter.login(
+        return await self._adapter.login(
             url=api_path,
             use_token=use_token,
             json=params,

@@ -10,7 +10,7 @@ class Health(SystemBackendMixin):
     Reference: https://www.vaultproject.io/api-docs/system/health
     """
 
-    def read_health_status(
+    async def read_health_status(
         self,
         standby_ok=None,
         active_code=None,
@@ -65,13 +65,13 @@ class Health(SystemBackendMixin):
 
         if method == "HEAD":
             api_path = utils.format_url("/v1/sys/health")
-            return self._adapter.head(
+            return await self._adapter.head(
                 url=api_path,
                 raise_exception=False,
             )
         elif method == "GET":
             api_path = utils.format_url("/v1/sys/health")
-            return self._adapter.get(
+            return await self._adapter.get(
                 url=api_path,
                 params=params,
                 raise_exception=False,

@@ -16,7 +16,7 @@ class Raft(SystemBackendMixin):
     Reference: https://www.vaultproject.io/api-docs/system/storage/raft
     """
 
-    def join_raft_cluster(
+    async def join_raft_cluster(
         self,
         leader_api_addr,
         retry=False,
@@ -58,12 +58,12 @@ class Raft(SystemBackendMixin):
             }
         )
         api_path = "/v1/sys/storage/raft/join"
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_raft_config(self):
+    async def read_raft_config(self):
         """Read the details of all the nodes in the raft cluster.
 
         Supported methods:
@@ -73,11 +73,11 @@ class Raft(SystemBackendMixin):
         :rtype: requests.Response
         """
         api_path = "/v1/sys/storage/raft/configuration"
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def remove_raft_node(self, server_id):
+    async def remove_raft_node(self, server_id):
         """Remove a node from the raft cluster.
 
         Supported methods:
@@ -92,12 +92,12 @@ class Raft(SystemBackendMixin):
             "server_id": server_id,
         }
         api_path = "/v1/sys/storage/raft/remove-peer"
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def take_raft_snapshot(self):
+    async def take_raft_snapshot(self):
         """Returns a snapshot of the current state of the raft cluster.
 
         The snapshot is returned as binary data and should be redirected to a file.
@@ -109,12 +109,12 @@ class Raft(SystemBackendMixin):
         :rtype: requests.Response
         """
         api_path = "/v1/sys/storage/raft/snapshot"
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
             stream=True,
         )
 
-    def restore_raft_snapshot(self, snapshot):
+    async def restore_raft_snapshot(self, snapshot):
         """Install the provided snapshot, returning the cluster to the state defined in it.
 
         Supported methods:
@@ -126,12 +126,12 @@ class Raft(SystemBackendMixin):
         :rtype: requests.Response
         """
         api_path = "/v1/sys/storage/raft/snapshot"
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             data=snapshot,
         )
 
-    def force_restore_raft_snapshot(self, snapshot):
+    async def force_restore_raft_snapshot(self, snapshot):
         """Installs the provided snapshot, returning the cluster to the state defined in it.
 
         This is same as writing to /sys/storage/raft/snapshot except that this bypasses checks
@@ -146,7 +146,7 @@ class Raft(SystemBackendMixin):
         :rtype: requests.Response
         """
         api_path = "/v1/sys/storage/raft/snapshot-force"
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             data=snapshot,
         )

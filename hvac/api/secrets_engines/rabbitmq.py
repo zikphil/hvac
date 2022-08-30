@@ -12,7 +12,7 @@ class RabbitMQ(VaultApiBase):
     Reference: https://www.vaultproject.io/api/secret/rabbitmq/index.html
     """
 
-    def configure(
+    async def configure(
         self,
         connection_uri="",
         username="",
@@ -36,7 +36,7 @@ class RabbitMQ(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: rabbitmq).
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "connection_uri": connection_uri,
@@ -48,12 +48,12 @@ class RabbitMQ(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/config/connection", mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def configure_lease(self, ttl, max_ttl, mount_point=DEFAULT_MOUNT_POINT):
+    async def configure_lease(self, ttl, max_ttl, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint configures the lease settings for generated credentials.
 
         :param ttl: Specifies the lease ttl provided in seconds.
@@ -63,19 +63,19 @@ class RabbitMQ(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: rabbitmq).
         :type mount_point: str | unicode
         :return: The JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url("/v1/{}/config/lease", mount_point)
         params = {
             "ttl": ttl,
             "max_ttl": max_ttl,
         }
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def create_role(
+    async def create_role(
         self, name, tags="", vhosts="", vhost_topics="", mount_point=DEFAULT_MOUNT_POINT
     ):
         """This endpoint creates or updates the role definition.
@@ -91,16 +91,16 @@ class RabbitMQ(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: rabbitmq).
         :type mount_point: str | unicode
         :return: The JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url("/v1/{}/roles/{}", mount_point, name)
         params = {"tags": tags, "vhosts": vhosts, "vhost_topics": vhost_topics}
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint queries the role definition.
 
         :param name:  Specifies the name of the role to read.
@@ -108,14 +108,14 @@ class RabbitMQ(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: rabbitmq).
         :type mount_point: str | unicode
         :return: The JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url("/v1/{}/roles/{}", mount_point, name)
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def delete_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint deletes the role definition.
         Even if the role does not exist, this endpoint will still return a successful response.
 
@@ -124,14 +124,14 @@ class RabbitMQ(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: rabbitmq).
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url("/v1/{}/roles/{}", mount_point, name)
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def generate_credentials(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def generate_credentials(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint generates a new set of dynamic credentials based on the named role.
 
         :param name: Specifies the name of the role to create credentials against.
@@ -139,9 +139,9 @@ class RabbitMQ(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: rabbitmq).
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url("/v1/{}/creds/{}", mount_point, name)
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )

@@ -13,7 +13,7 @@ class Transit(VaultApiBase):
     Reference: https://www.vaultproject.io/api/secret/transit/index.html
     """
 
-    def create_key(
+    async def create_key(
         self,
         name,
         convergent_encryption=None,
@@ -60,7 +60,7 @@ class Transit(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         if convergent_encryption and not derived:
             raise exceptions.ParamValidationError(
@@ -88,12 +88,12 @@ class Transit(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_key(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_key(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Read information about a named encryption key.
 
         The keys object shows the creation time of each key version; the values are not the keys themselves. Depending
@@ -115,11 +115,11 @@ class Transit(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def list_keys(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_keys(self, mount_point=DEFAULT_MOUNT_POINT):
         """List keys (if there are any).
 
         Only the key names are returned (not the actual keys themselves).
@@ -135,9 +135,9 @@ class Transit(VaultApiBase):
         :rtype: dict
         """
         api_path = utils.format_url("/v1/{mount_point}/keys", mount_point=mount_point)
-        return self._adapter.list(url=api_path)
+        return await self._adapter.list(url=api_path)
 
-    def delete_key(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_key(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Delete a named encryption key.
 
         It will no longer be possible to decrypt any data encrypted with the named key. Because this is a potentially
@@ -151,18 +151,18 @@ class Transit(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/keys/{name}",
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def update_key_configuration(
+    async def update_key_configuration(
         self,
         name,
         min_decryption_version=None,
@@ -202,7 +202,7 @@ class Transit(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         if min_encryption_version is not None and min_decryption_version is not None:
             if (
@@ -226,12 +226,12 @@ class Transit(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def rotate_key(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def rotate_key(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Rotate the version of the named key.
 
         After rotation, new plaintext requests will be encrypted with the new version of the key. To upgrade ciphertext
@@ -246,18 +246,18 @@ class Transit(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/keys/{name}/rotate",
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
         )
 
-    def export_key(self, name, key_type, version=None, mount_point=DEFAULT_MOUNT_POINT):
+    async def export_key(self, name, key_type, version=None, mount_point=DEFAULT_MOUNT_POINT):
         """Return the named key.
 
         The keys object shows the value of the key for each version. If version is specified, the specific version will
@@ -299,11 +299,11 @@ class Transit(VaultApiBase):
         )
         if version is not None:
             api_path = self._adapter.urljoin(api_path, version)
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def encrypt_data(
+    async def encrypt_data(
         self,
         name,
         plaintext,
@@ -379,12 +379,12 @@ class Transit(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def decrypt_data(
+    async def decrypt_data(
         self,
         name,
         ciphertext,
@@ -435,12 +435,12 @@ class Transit(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def rewrap_data(
+    async def rewrap_data(
         self,
         name,
         ciphertext,
@@ -498,12 +498,12 @@ class Transit(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def generate_data_key(
+    async def generate_data_key(
         self,
         name,
         key_type,
@@ -575,12 +575,12 @@ class Transit(VaultApiBase):
             key_type=key_type,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def generate_random_bytes(
+    async def generate_random_bytes(
         self, n_bytes=None, output_format=None, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Return high-quality random bytes of the specified length.
@@ -605,12 +605,12 @@ class Transit(VaultApiBase):
             }
         )
         api_path = utils.format_url("/v1/{mount_point}/random", mount_point=mount_point)
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def hash_data(
+    async def hash_data(
         self,
         hash_input,
         algorithm=None,
@@ -672,12 +672,12 @@ class Transit(VaultApiBase):
             )
         )
         api_path = utils.format_url("/v1/{mount_point}/hash", mount_point=mount_point)
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def generate_hmac(
+    async def generate_hmac(
         self,
         name,
         hash_input,
@@ -738,12 +738,12 @@ class Transit(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def sign_data(
+    async def sign_data(
         self,
         name,
         hash_input,
@@ -854,12 +854,12 @@ class Transit(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def verify_signed_data(
+    async def verify_signed_data(
         self,
         name,
         hash_input,
@@ -973,12 +973,12 @@ class Transit(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/verify/{name}", mount_point=mount_point, name=name
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def backup_key(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def backup_key(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Return a plaintext backup of a named key.
 
         The backup contains all the configuration data and keys of all the versions along with the HMAC key. The
@@ -999,11 +999,11 @@ class Transit(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def restore_key(
+    async def restore_key(
         self, backup, name=None, force=None, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Restore the backup as a named key.
@@ -1026,7 +1026,7 @@ class Transit(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "backup": backup,
@@ -1043,12 +1043,12 @@ class Transit(VaultApiBase):
         )
         if name is not None:
             api_path = self._adapter.urljoin(api_path, name)
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def trim_key(self, name, min_version, mount_point=DEFAULT_MOUNT_POINT):
+    async def trim_key(self, name, min_version, mount_point=DEFAULT_MOUNT_POINT):
         """Trims older key versions setting a minimum version for the keyring.
 
         Once trimmed, previous versions of the key cannot be recovered.
@@ -1075,7 +1075,7 @@ class Transit(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )

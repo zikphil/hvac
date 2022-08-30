@@ -3,7 +3,7 @@ from hvac.api.system_backend.system_backend_mixin import SystemBackendMixin
 
 
 class Lease(SystemBackendMixin):
-    def read_lease(self, lease_id):
+    async def read_lease(self, lease_id):
         """Retrieve lease metadata.
 
         Supported methods:
@@ -16,9 +16,9 @@ class Lease(SystemBackendMixin):
         """
         params = {"lease_id": lease_id}
         api_path = "/v1/sys/leases/lookup"
-        return self._adapter.put(url=api_path, json=params)
+        return await self._adapter.put(url=api_path, json=params)
 
-    def list_leases(self, prefix):
+    async def list_leases(self, prefix):
         """Retrieve a list of lease ids.
 
         Supported methods:
@@ -30,11 +30,11 @@ class Lease(SystemBackendMixin):
         :rtype: dict
         """
         api_path = utils.format_url("/v1/sys/leases/lookup/{prefix}", prefix=prefix)
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def renew_lease(self, lease_id, increment=None):
+    async def renew_lease(self, lease_id, increment=None):
         """Renew a lease, requesting to extend the lease.
 
         Supported methods:
@@ -52,12 +52,12 @@ class Lease(SystemBackendMixin):
             "increment": increment,
         }
         api_path = "/v1/sys/leases/renew"
-        return self._adapter.put(
+        return await self._adapter.put(
             url=api_path,
             json=params,
         )
 
-    def revoke_lease(self, lease_id):
+    async def revoke_lease(self, lease_id):
         """Revoke a lease immediately.
 
         Supported methods:
@@ -72,12 +72,12 @@ class Lease(SystemBackendMixin):
             "lease_id": lease_id,
         }
         api_path = "/v1/sys/leases/revoke"
-        return self._adapter.put(
+        return await self._adapter.put(
             url=api_path,
             json=params,
         )
 
-    def revoke_prefix(self, prefix):
+    async def revoke_prefix(self, prefix):
         """Revoke all secrets (via a lease ID prefix) or tokens (via the tokens' path property) generated under a given
         prefix immediately.
 
@@ -99,12 +99,12 @@ class Lease(SystemBackendMixin):
         api_path = utils.format_url(
             "/v1/sys/leases/revoke-prefix/{prefix}", prefix=prefix
         )
-        return self._adapter.put(
+        return await self._adapter.put(
             url=api_path,
             json=params,
         )
 
-    def revoke_force(self, prefix):
+    async def revoke_force(self, prefix):
         """Revoke all secrets or tokens generated under a given prefix immediately.
 
         Unlike revoke_prefix, this path ignores backend errors encountered during revocation. This is potentially very
@@ -125,7 +125,7 @@ class Lease(SystemBackendMixin):
         api_path = utils.format_url(
             "/v1/sys/leases/revoke-force/{prefix}", prefix=prefix
         )
-        return self._adapter.put(
+        return await self._adapter.put(
             url=api_path,
             json=params,
         )

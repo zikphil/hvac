@@ -65,7 +65,7 @@ class AuthMethods(VaultApiCategory):
         "AliCloud",
     ]
 
-    def __call__(self, *args, **kwargs):
+    async def __call__(self, *args, **kwargs):
         """Implement callable magic method for backwards compatibility.
 
         Older versions of hvac.Client had an auth method that has now been replaced with an "auth" property pointing to
@@ -83,4 +83,4 @@ class AuthMethods(VaultApiCategory):
             stacklevel=2,
         )
 
-        return self._adapter.login(*args, **kwargs)
+        return await self._adapter.login(*args, **kwargs)

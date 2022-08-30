@@ -14,7 +14,7 @@ class Ssh(VaultApiBase):
     Reference: https://www.vaultproject.io/api-docs/secret/ssh
     """
 
-    def create_or_update_key(
+    async def create_or_update_key(
         self,
         name="",
         key="",
@@ -29,7 +29,7 @@ class Ssh(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: ssh).
         :type mount_point: str | unicode
         :return: The JSON response of the request
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "key": key,
@@ -41,12 +41,12 @@ class Ssh(VaultApiBase):
             name=name,
         )
 
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def delete_key(
+    async def delete_key(
         self,
         name="",
         mount_point=DEFAULT_MOUNT_POINT,
@@ -58,7 +58,7 @@ class Ssh(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: ssh).
         :type mount_point: str | unicode
         :return: The JSON response of the request
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/keys/{name}",
@@ -66,9 +66,9 @@ class Ssh(VaultApiBase):
             name=name,
         )
 
-        return self._adapter.delete(url=api_path)
+        return await self._adapter.delete(url=api_path)
 
-    def create_role(
+    async def create_role(
         self,
         name="",
         key="",
@@ -174,7 +174,7 @@ class Ssh(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: ssh).
         :type mount_point: str | unicode
         :return: The JSON response of the request
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "key": key,
@@ -210,9 +210,9 @@ class Ssh(VaultApiBase):
             "/v1/{mount_point}/roles/{name}", mount_point=mount_point, name=name
         )
 
-        return self._adapter.post(url=api_path, json=params)
+        return await self._adapter.post(url=api_path, json=params)
 
-    def read_role(
+    async def read_role(
         self,
         name="",
         mount_point=DEFAULT_MOUNT_POINT,
@@ -224,7 +224,7 @@ class Ssh(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: ssh).
         :type mount_point: str | unicode
         :return: The JSON response of the request
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/roles/{name}",
@@ -232,9 +232,9 @@ class Ssh(VaultApiBase):
             name=name,
         )
 
-        return self._adapter.get(url=api_path)
+        return await self._adapter.get(url=api_path)
 
-    def list_roles(
+    async def list_roles(
         self,
         mount_point=DEFAULT_MOUNT_POINT,
     ):
@@ -243,13 +243,13 @@ class Ssh(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: ssh).
         :type mount_point: str | unicode
         :return: The JSON response of the request
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url("/v1/{mount_point}/roles", mount_point=mount_point)
 
-        return self._adapter.list(url=api_path)
+        return await self._adapter.list(url=api_path)
 
-    def delete_role(self, name="", mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_role(self, name="", mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint deletes a named role.
 
         :param name:
@@ -257,7 +257,7 @@ class Ssh(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: ssh).
         :type mount_point: str | unicode
         :return: The JSON response of the request
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/roles/{name}",
@@ -265,9 +265,9 @@ class Ssh(VaultApiBase):
             name=name,
         )
 
-        return self._adapter.delete(url=api_path)
+        return await self._adapter.delete(url=api_path)
 
-    def list_zeroaddress_roles(
+    async def list_zeroaddress_roles(
         self,
         mount_point=DEFAULT_MOUNT_POINT,
     ):
@@ -276,16 +276,16 @@ class Ssh(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: ssh).
         :type mount_point: str | unicode
         :return: The JSON response of the request
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/config/zeroaddress",
             mount_point=mount_point,
         )
 
-        return self._adapter.get(url=api_path)
+        return await self._adapter.get(url=api_path)
 
-    def configure_zeroaddress_roles(
+    async def configure_zeroaddress_roles(
         self,
         roles="",
         mount_point=DEFAULT_MOUNT_POINT,
@@ -297,7 +297,7 @@ class Ssh(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: ssh).
         :type mount_point: str | unicode
         :return: The JSON response of the request
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "roles": roles,
@@ -308,28 +308,28 @@ class Ssh(VaultApiBase):
             mount_point=mount_point,
         )
 
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def delete_zeroaddress_role(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_zeroaddress_role(self, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint deletes the zero-address roles configuration.
 
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: ssh).
         :type mount_point: str | unicode
         :return: The JSON response of the request
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/config/zeroaddress", mount_point=mount_point
         )
 
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def generate_ssh_credentials(
+    async def generate_ssh_credentials(
         self,
         name="",
         username="",
@@ -347,7 +347,7 @@ class Ssh(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: ssh).
         :type mount_point: str | unicode
         :return: The JSON response of the request
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "username": username,
@@ -360,9 +360,9 @@ class Ssh(VaultApiBase):
             name=name,
         )
 
-        return self._adapter.post(url=api_path, json=params)
+        return await self._adapter.post(url=api_path, json=params)
 
-    def list_roles_by_ip(
+    async def list_roles_by_ip(
         self,
         ip="",
         mount_point=DEFAULT_MOUNT_POINT,
@@ -374,7 +374,7 @@ class Ssh(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: ssh).
         :type mount_point: str | unicode
         :return: The JSON response of the request
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "ip": ip,
@@ -385,12 +385,12 @@ class Ssh(VaultApiBase):
             mount_point=mount_point,
         )
 
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def verify_ssh_otp(
+    async def verify_ssh_otp(
         self,
         otp,
         mount_point=DEFAULT_MOUNT_POINT,
@@ -402,7 +402,7 @@ class Ssh(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: ssh).
         :type mount_point: str | unicode
         :return: The JSON response of the request
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "otp": otp,
@@ -413,12 +413,12 @@ class Ssh(VaultApiBase):
             mount_point=mount_point,
         )
 
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def submit_ca_information(
+    async def submit_ca_information(
         self,
         private_key="",
         public_key="",
@@ -442,7 +442,7 @@ class Ssh(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: ssh).
         :type mount_point: str | unicode
         :return: The JSON response of the request
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "private_key": private_key,
@@ -457,12 +457,12 @@ class Ssh(VaultApiBase):
             mount_point=mount_point,
         )
 
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def delete_ca_information(
+    async def delete_ca_information(
         self,
         mount_point=DEFAULT_MOUNT_POINT,
     ):
@@ -471,16 +471,16 @@ class Ssh(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: ssh).
         :type mount_point: str | unicode
         :return: The JSON response of the request
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/config/ca",
             mount_point=mount_point,
         )
 
-        return self._adapter.delete(url=api_path)
+        return await self._adapter.delete(url=api_path)
 
-    def read_public_key(
+    async def read_public_key(
         self,
         mount_point=DEFAULT_MOUNT_POINT,
     ):
@@ -489,7 +489,7 @@ class Ssh(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: ssh).
         :type mount_point: str | unicode
         :return: The JSON response of the request
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         # TODO Consider if the unauthenticated endpoint could be used if not authenticated
         api_path = utils.format_url(
@@ -497,9 +497,9 @@ class Ssh(VaultApiBase):
             mount_point=mount_point,
         )
 
-        return self._adapter.get(url=api_path)
+        return await self._adapter.get(url=api_path)
 
-    def sign_ssh_key(
+    async def sign_ssh_key(
         self,
         name="",
         public_key="",
@@ -533,7 +533,7 @@ class Ssh(VaultApiBase):
         :param mount_point: Specifies the place where the secrets engine will be accessible (default: ssh).
         :type mount_point: str | unicode
         :return: The JSON response of the request
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "public_key": public_key,
@@ -549,7 +549,7 @@ class Ssh(VaultApiBase):
             "/v1/{mount_point}/sign/{name}", mount_point=mount_point, name=name
         )
 
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )

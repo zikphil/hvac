@@ -11,7 +11,7 @@ class Userpass(VaultApiBase):
     Reference: https://www.vaultproject.io/api/auth/userpass/index.html
     """
 
-    def create_or_update_user(
+    async def create_or_update_user(
         self,
         username,
         password=None,
@@ -47,12 +47,12 @@ class Userpass(VaultApiBase):
         api_path = "/v1/auth/{mount_point}/users/{username}".format(
             mount_point=mount_point, username=username
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def list_user(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_user(self, mount_point=DEFAULT_MOUNT_POINT):
         """
         List existing users that have been created in the auth method
 
@@ -65,11 +65,11 @@ class Userpass(VaultApiBase):
         :rtype: dict
         """
         api_path = f"/v1/auth/{mount_point}/users"
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def read_user(self, username, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_user(self, username, mount_point=DEFAULT_MOUNT_POINT):
         """
         Read user in the auth method.
 
@@ -86,11 +86,11 @@ class Userpass(VaultApiBase):
         api_path = "/v1/auth/{mount_point}/users/{username}".format(
             mount_point=mount_point, username=username
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def delete_user(self, username, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_user(self, username, mount_point=DEFAULT_MOUNT_POINT):
         """
         Delete user in the auth method.
 
@@ -107,11 +107,11 @@ class Userpass(VaultApiBase):
         api_path = "/v1/auth/{mount_point}/users/{username}".format(
             mount_point=mount_point, username=username
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def update_password_on_user(
+    async def update_password_on_user(
         self, username, password, mount_point=DEFAULT_MOUNT_POINT
     ):
         """
@@ -133,12 +133,12 @@ class Userpass(VaultApiBase):
         api_path = "/v1/auth/{mount_point}/users/{username}/password".format(
             mount_point=mount_point, username=username
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def login(
+    async def login(
         self, username, password, use_token=True, mount_point=DEFAULT_MOUNT_POINT
     ):
         """
@@ -160,7 +160,7 @@ class Userpass(VaultApiBase):
         api_path = "/v1/auth/{mount_point}/login/{username}".format(
             mount_point=mount_point, username=username
         )
-        return self._adapter.login(
+        return await self._adapter.login(
             url=api_path,
             use_token=use_token,
             json=params,

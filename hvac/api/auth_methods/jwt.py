@@ -27,7 +27,7 @@ class JWT(VaultApiBase):
         """
         return path if path is not None else self.DEFAULT_PATH
 
-    def configure(
+    async def configure(
         self,
         oidc_discovery_url=None,
         oidc_discovery_ca_pem=None,
@@ -87,7 +87,7 @@ class JWT(VaultApiBase):
         :param path: The "path" the method/backend was mounted on.
         :type path: str | unicode
         :return: The response of the configure request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -110,12 +110,12 @@ class JWT(VaultApiBase):
             "/v1/auth/{path}/config",
             path=self.resolve_path(path),
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_config(self, path=None):
+    async def read_config(self, path=None):
         """Read the previously configured config.
 
         Supported methods:
@@ -128,11 +128,11 @@ class JWT(VaultApiBase):
             "/v1/auth/{path}/config",
             path=self.resolve_path(path),
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def create_role(
+    async def create_role(
         self,
         name,
         user_claim,
@@ -276,12 +276,12 @@ class JWT(VaultApiBase):
             path=self.resolve_path(path),
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_role(self, name, path=None):
+    async def read_role(self, name, path=None):
         """Read the previously registered role configuration.
 
         Supported methods:
@@ -299,11 +299,11 @@ class JWT(VaultApiBase):
             path=self.resolve_path(path),
             name=name,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def list_roles(self, path=None):
+    async def list_roles(self, path=None):
         """List all the roles that are registered with the plugin.
 
         Supported methods:
@@ -318,11 +318,11 @@ class JWT(VaultApiBase):
             "/v1/auth/{path}/role",
             path=self.resolve_path(path),
         )
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def delete_role(self, name, path=None):
+    async def delete_role(self, name, path=None):
         """Delete the previously registered role.
 
         Supported methods:
@@ -333,18 +333,18 @@ class JWT(VaultApiBase):
         :param path: The "path" the method/backend was mounted on.
         :type path: str | unicode
         :return: The response of the delete_role request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{path}/role/{name}",
             path=self.resolve_path(path),
             name=name,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def oidc_authorization_url_request(self, role, redirect_uri, path=None):
+    async def oidc_authorization_url_request(self, role, redirect_uri, path=None):
         """Obtain an authorization URL from Vault to start an OIDC login flow.
 
         Supported methods:
@@ -357,7 +357,7 @@ class JWT(VaultApiBase):
         :param path: The "path" the method/backend was mounted on.
         :type path: str | unicode
         :return: The response of the _authorization_url_request request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "role": role,
@@ -367,12 +367,12 @@ class JWT(VaultApiBase):
             "/v1/auth/{path}/oidc/auth_url",
             path=self.resolve_path(path),
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def oidc_callback(self, state, nonce, code, path=None):
+    async def oidc_callback(self, state, nonce, code, path=None):
         """Exchange an authorization code for an OIDC ID Token.
 
         The ID token will be further validated against any bound claims, and if valid a Vault token will be returned.
@@ -392,7 +392,7 @@ class JWT(VaultApiBase):
         :param path: The "path" the method/backend was mounted on.
         :type path: str | unicode
         :return: The response of the _callback request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "state": state,
@@ -406,12 +406,12 @@ class JWT(VaultApiBase):
             nonce=nonce,
             code=code,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
             json=params,
         )
 
-    def jwt_login(self, role, jwt, use_token=True, path=None):
+    async def jwt_login(self, role, jwt, use_token=True, path=None):
         """Fetch a token.
 
         This endpoint takes a signed JSON Web Token (JWT) and a role name for some entity.
@@ -428,7 +428,7 @@ class JWT(VaultApiBase):
         :param path: The "path" the method/backend was mounted on.
         :type path: str | unicode
         :return: The response of the jwt_login request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "role": role,
@@ -438,7 +438,7 @@ class JWT(VaultApiBase):
             "/v1/auth/{path}/login",
             path=self.resolve_path(path),
         )
-        return self._adapter.login(
+        return await self._adapter.login(
             url=api_path,
             use_token=use_token,
             json=params,

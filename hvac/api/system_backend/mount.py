@@ -3,7 +3,7 @@ from hvac.api.system_backend.system_backend_mixin import SystemBackendMixin
 
 
 class Mount(SystemBackendMixin):
-    def list_mounted_secrets_engines(self):
+    async def list_mounted_secrets_engines(self):
         """Lists all the mounted secrets engines.
 
         Supported methods:
@@ -12,18 +12,19 @@ class Mount(SystemBackendMixin):
         :return: JSON response of the request.
         :rtype: dict
         """
-        return self._adapter.get("/v1/sys/mounts")
+        return await self._adapter.get("/v1/sys/mounts")
 
-    def retrieve_mount_option(self, mount_point, option_name, default_value=None):
+    async def retrieve_mount_option(self, mount_point, option_name, default_value=None):
         secrets_engine_path = f"{mount_point}/"
-        secrets_engines_list = self.list_mounted_secrets_engines()["data"]
+        secrets_engines_list_req = await self.list_mounted_secrets_engines()
+        secrets_engines_list = secrets_engines_list_req["data"]
         mount_options = secrets_engines_list[secrets_engine_path].get("options")
         if mount_options is None:
             return default_value
 
         return mount_options.get(option_name, default_value)
 
-    def enable_secrets_engine(
+    async def enable_secrets_engine(
         self,
         backend_type,
         path=None,
@@ -94,12 +95,12 @@ class Mount(SystemBackendMixin):
         params.update(kwargs)
 
         api_path = utils.format_url("/v1/sys/mounts/{path}", path=path)
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def disable_secrets_engine(self, path):
+    async def disable_secrets_engine(self, path):
         """Disable the mount point specified by the provided path.
 
         Supported methods:
@@ -111,11 +112,11 @@ class Mount(SystemBackendMixin):
         :rtype: requests.Response
         """
         api_path = utils.format_url("/v1/sys/mounts/{path}", path=path)
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def read_mount_configuration(self, path):
+    async def read_mount_configuration(self, path):
         """Read the given mount's configuration.
 
         Unlike the mounts endpoint, this will return the current time in seconds for each TTL, which may be the system
@@ -130,11 +131,11 @@ class Mount(SystemBackendMixin):
         :rtype: requests.Response
         """
         api_path = utils.format_url("/v1/sys/mounts/{path}/tune", path=path)
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def tune_mount_configuration(
+    async def tune_mount_configuration(
         self,
         path,
         default_lease_ttl=None,
@@ -210,12 +211,12 @@ class Mount(SystemBackendMixin):
         params.update(kwargs)
 
         api_path = utils.format_url("/v1/sys/mounts/{path}/tune", path=path)
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def move_backend(self, from_path, to_path):
+    async def move_backend(self, from_path, to_path):
         """Move an already-mounted backend to a new mount point.
 
         Supported methods:
@@ -233,7 +234,7 @@ class Mount(SystemBackendMixin):
             "to": to_path,
         }
         api_path = "/v1/sys/remount"
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )

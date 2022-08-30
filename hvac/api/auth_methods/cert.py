@@ -12,7 +12,7 @@ class Cert(VaultApiBase):
     Reference: https://www.vaultproject.io/api/auth/cert/index.html
     """
 
-    def create_ca_certificate_role(
+    async def create_ca_certificate_role(
         self,
         name,
         certificate,
@@ -136,12 +136,12 @@ class Cert(VaultApiBase):
         api_path = "/v1/auth/{mount_point}/certs/{name}".format(
             mount_point=mount_point, name=name
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_ca_certificate_role(self, name, mount_point="cert"):
+    async def read_ca_certificate_role(self, name, mount_point="cert"):
         """
         Gets information associated with the named role.
 
@@ -161,12 +161,12 @@ class Cert(VaultApiBase):
         api_path = "/v1/auth/{mount_point}/certs/{name}".format(
             mount_point=mount_point, name=name
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
             json=params,
         )
 
-    def list_certificate_roles(self, mount_point="cert"):
+    async def list_certificate_roles(self, mount_point="cert"):
         """
         Lists configured certificate names.
 
@@ -176,12 +176,12 @@ class Cert(VaultApiBase):
         :param mount_point:
         :type mount_point:
         :return: The response of the list_certificate request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = f"/v1/auth/{mount_point}/certs"
-        return self._adapter.list(url=api_path)
+        return await self._adapter.list(url=api_path)
 
-    def delete_certificate_role(self, name, mount_point="cert"):
+    async def delete_certificate_role(self, name, mount_point="cert"):
         """
         List existing LDAP existing groups that have been created in this auth method.
 
@@ -196,11 +196,11 @@ class Cert(VaultApiBase):
         api_path = "/v1/auth/{mount_point}/certs/{name}".format(
             mount_point=mount_point, name=name
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def configure_tls_certificate(self, mount_point="cert", disable_binding=False):
+    async def configure_tls_certificate(self, mount_point="cert", disable_binding=False):
         """
         Configure options for the method.
 
@@ -218,12 +218,12 @@ class Cert(VaultApiBase):
             "disable_binding": disable_binding,
         }
         api_path = f"/v1/auth/{mount_point}/config"
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def login(
+    async def login(
         self,
         name="",
         cacert=False,
@@ -257,7 +257,7 @@ class Cert(VaultApiBase):
         :param use_token: If the returned token is stored in the client
         :param use_token: bool
         :return: The response of the login request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {}
         if name != "":
@@ -300,7 +300,7 @@ class Cert(VaultApiBase):
                 "cert": tuple([cert_pem, key_pem]),
             }
 
-        return self._adapter.login(
+        return await self._adapter.login(
             url=api_path, use_token=use_token, json=params, **additional_request_kwargs
         )
 

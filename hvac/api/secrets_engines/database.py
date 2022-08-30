@@ -12,7 +12,7 @@ class Database(VaultApiBase):
     Reference: https://www.vaultproject.io/api/secret/databases/index.html
     """
 
-    def configure(
+    async def configure(
         self,
         name,
         plugin_name,
@@ -41,7 +41,7 @@ class Database(VaultApiBase):
             the root user's credentials.
         :type root_rotation_statements: list
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "plugin_name": plugin_name,
@@ -61,89 +61,89 @@ class Database(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/config/{name}", mount_point=mount_point, name=name
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def rotate_root_credentials(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def rotate_root_credentials(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint is used to rotate the root superuser credentials stored for the database connection.
         This user must have permissions to update its own password.
 
         :param name: Specifies the name of the connection to rotate.
         :type name: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/rotate-root/{name}", mount_point=mount_point, name=name
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
         )
 
-    def read_connection(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_connection(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint returns the configuration settings for a connection.
 
         :param name: Specifies the name of the connection to read.
         :type name: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
 
         api_path = utils.format_url(
             "/v1/{mount_point}/config/{name}", mount_point=mount_point, name=name
         )
 
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def list_connections(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_connections(self, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint returns a list of available connections.
 
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
 
         api_path = utils.format_url("/v1/{mount_point}/config", mount_point=mount_point)
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def delete_connection(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_connection(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint deletes a connection.
 
 
         :param name: Specifies the name of the connection to delete.
         :type name: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/config/{name}", mount_point=mount_point, name=name
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def reset_connection(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def reset_connection(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint closes a connection and it's underlying plugin and
         restarts it with the configuration stored in the barrier.
 
         :param name: Specifies the name of the connection to reset.
         :type name: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/reset/{name}", mount_point=mount_point, name=name
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
         )
 
-    def create_role(
+    async def create_role(
         self,
         name,
         db_name,
@@ -177,7 +177,7 @@ class Database(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
 
         params = {
@@ -199,9 +199,9 @@ class Database(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/roles/{name}", mount_point=mount_point, name=name
         )
-        return self._adapter.post(url=api_path, json=params)
+        return await self._adapter.post(url=api_path, json=params)
 
-    def create_static_role(
+    async def create_static_role(
         self,
         name,
         db_name,
@@ -227,7 +227,7 @@ class Database(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
 
         params = {
@@ -240,9 +240,9 @@ class Database(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/static-roles/{name}", mount_point=mount_point, name=name
         )
-        return self._adapter.post(url=api_path, json=params)
+        return await self._adapter.post(url=api_path, json=params)
 
-    def read_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint queries the role definition.
 
         :param name: Specifies the name of the role to read.
@@ -250,48 +250,48 @@ class Database(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
 
         api_path = utils.format_url(
             "/v1/{mount_point}/roles/{name}", mount_point=mount_point, name=name
         )
 
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def list_roles(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_roles(self, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint returns a list of available roles.
 
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
 
         api_path = utils.format_url("/v1/{mount_point}/roles", mount_point=mount_point)
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def list_static_roles(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_static_roles(self, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint returns a list of available static roles.
 
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
 
         api_path = utils.format_url(
             "/v1/{mount_point}/static-roles", mount_point=mount_point
         )
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def delete_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint deletes the role definition.
 
         :param name: Specifies the name of the role to delete.
@@ -299,16 +299,16 @@ class Database(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/roles/{name}", mount_point=mount_point, name=name
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def delete_static_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_static_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint deletes the static role definition.
 
         :param name: Specifies the name of the role to delete.
@@ -316,16 +316,16 @@ class Database(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/static-roles/{name}", mount_point=mount_point, name=name
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def generate_credentials(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def generate_credentials(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint generates a new set of dynamic credentials based on the named role.
 
         :param name: Specifies the name of the role to create credentials against
@@ -333,18 +333,18 @@ class Database(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
 
         api_path = utils.format_url(
             "/v1/{mount_point}/creds/{name}", mount_point=mount_point, name=name
         )
 
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def get_static_credentials(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def get_static_credentials(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """This endpoint returns the current credentials based on the named static role.
 
         :param name: Specifies the name of the role to create credentials against
@@ -352,13 +352,13 @@ class Database(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
 
         api_path = utils.format_url(
             "/v1/{mount_point}/static-creds/{name}", mount_point=mount_point, name=name
         )
 
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )

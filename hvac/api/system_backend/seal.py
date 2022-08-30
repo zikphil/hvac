@@ -2,16 +2,16 @@ from hvac.api.system_backend.system_backend_mixin import SystemBackendMixin
 
 
 class Seal(SystemBackendMixin):
-    def is_sealed(self):
+    async def is_sealed(self):
         """Determine if  Vault is sealed.
 
         :return: True if Vault is seal, False otherwise.
         :rtype: bool
         """
-        seal_status = self.read_seal_status()
+        seal_status = await self.read_seal_status()
         return seal_status["sealed"]
 
-    def read_seal_status(self):
+    async def read_seal_status(self):
         """Read the seal status of the Vault.
 
         This is an unauthenticated endpoint.
@@ -23,11 +23,11 @@ class Seal(SystemBackendMixin):
         :rtype: dict
         """
         api_path = "/v1/sys/seal-status"
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def seal(self):
+    async def seal(self):
         """Seal the Vault.
 
         In HA mode, only an active node can be sealed. Standby nodes should be restarted to get the same effect.
@@ -40,11 +40,11 @@ class Seal(SystemBackendMixin):
         :rtype: requests.Response
         """
         api_path = "/v1/sys/seal"
-        return self._adapter.put(
+        return await self._adapter.put(
             url=api_path,
         )
 
-    def submit_unseal_key(self, key=None, reset=False, migrate=False):
+    async def submit_unseal_key(self, key=None, reset=False, migrate=False):
         """Enter a single master key share to progress the unsealing of the Vault.
 
         If the threshold number of master key shares is reached, Vault will attempt to unseal the Vault. Otherwise, this
@@ -75,12 +75,12 @@ class Seal(SystemBackendMixin):
             params["reset"] = reset
 
         api_path = "/v1/sys/unseal"
-        return self._adapter.put(
+        return await self._adapter.put(
             url=api_path,
             json=params,
         )
 
-    def submit_unseal_keys(self, keys, migrate=False):
+    async def submit_unseal_keys(self, keys, migrate=False):
         """Enter multiple master key share to progress the unsealing of the Vault.
 
         :param keys: List of master key shares.
@@ -94,7 +94,7 @@ class Seal(SystemBackendMixin):
         result = None
 
         for key in keys:
-            result = self.submit_unseal_key(
+            result = await self.submit_unseal_key(
                 key=key,
                 migrate=migrate,
             )

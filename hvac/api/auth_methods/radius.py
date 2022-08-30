@@ -12,7 +12,7 @@ class Radius(VaultApiBase):
     Reference: https://www.vaultproject.io/docs/auth/radius.html
     """
 
-    def configure(
+    async def configure(
         self,
         host,
         secret,
@@ -43,7 +43,7 @@ class Radius(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the configure request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "host": host,
@@ -72,12 +72,12 @@ class Radius(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config", mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_configuration(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_configuration(self, mount_point=DEFAULT_MOUNT_POINT):
         """
         Retrieve the RADIUS configuration for the auth method.
 
@@ -92,11 +92,11 @@ class Radius(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config", mount_point=mount_point
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def register_user(self, username, policies=None, mount_point=DEFAULT_MOUNT_POINT):
+    async def register_user(self, username, policies=None, mount_point=DEFAULT_MOUNT_POINT):
         """
         Create or update RADIUS user with a set of policies.
 
@@ -111,7 +111,7 @@ class Radius(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the register_user request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         if policies is not None and not isinstance(policies, list):
             error_msg = '"policies" argument must be an instance of list or None, "{policies_type}" provided.'.format(
@@ -127,12 +127,12 @@ class Radius(VaultApiBase):
             mount_point=mount_point,
             name=username,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def list_users(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_users(self, mount_point=DEFAULT_MOUNT_POINT):
         """
         List existing users in the method.
 
@@ -148,11 +148,11 @@ class Radius(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/users", mount_point=mount_point
         )
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def read_user(self, username, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_user(self, username, mount_point=DEFAULT_MOUNT_POINT):
         """
         Read policies associated with a RADIUS user.
 
@@ -172,11 +172,11 @@ class Radius(VaultApiBase):
             mount_point=mount_point,
             username=username,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def delete_user(self, username, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_user(self, username, mount_point=DEFAULT_MOUNT_POINT):
         """
         Delete a RADIUS user and policy association.
 
@@ -189,18 +189,18 @@ class Radius(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the delete_user request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/users/{username}",
             mount_point=mount_point,
             username=username,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def login(
+    async def login(
         self, username, password, use_token=True, mount_point=DEFAULT_MOUNT_POINT
     ):
         """
@@ -220,7 +220,7 @@ class Radius(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the login_with_user request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "password": password,
@@ -230,7 +230,7 @@ class Radius(VaultApiBase):
             mount_point=mount_point,
             username=username,
         )
-        return self._adapter.login(
+        return await self._adapter.login(
             url=api_path,
             use_token=use_token,
             json=params,

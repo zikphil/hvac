@@ -12,7 +12,7 @@ class KvV1(VaultApiBase):
     Reference: https://www.vaultproject.io/api/secrets/kv/kv-v1.html
     """
 
-    def read_secret(self, path, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_secret(self, path, mount_point=DEFAULT_MOUNT_POINT):
         """Retrieve the secret at the specified location.
 
         Supported methods:
@@ -29,11 +29,11 @@ class KvV1(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/{path}", mount_point=mount_point, path=path
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def list_secrets(self, path, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_secrets(self, path, mount_point=DEFAULT_MOUNT_POINT):
         """Return a list of key names at the specified location.
 
         Folders are suffixed with /. The input must be a folder; list on a file will not return a value. Note that no
@@ -54,11 +54,11 @@ class KvV1(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/{path}", mount_point=mount_point, path=path
         )
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def create_or_update_secret(
+    async def create_or_update_secret(
         self, path, secret, method=None, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Store a secret at the specified location.
@@ -83,13 +83,13 @@ class KvV1(VaultApiBase):
         :param mount_point: The "path" the secret engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the create_or_update_secret request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         if method is None:
             # If no method was selected by the caller, use the result of a `read_secret()` call to determine if we need
             # to perform an update (PUT) or creation (POST) request.
             try:
-                self.read_secret(
+                await self.read_secret(
                     path=path,
                     mount_point=mount_point,
                 )
@@ -101,7 +101,7 @@ class KvV1(VaultApiBase):
             api_path = utils.format_url(
                 "/v1/{mount_point}/{path}", mount_point=mount_point, path=path
             )
-            return self._adapter.post(
+            return await self._adapter.post(
                 url=api_path,
                 json=secret,
             )
@@ -110,7 +110,7 @@ class KvV1(VaultApiBase):
             api_path = utils.format_url(
                 "/v1/{mount_point}/{path}", mount_point=mount_point, path=path
             )
-            return self._adapter.put(
+            return await self._adapter.put(
                 url=api_path,
                 json=secret,
             )
@@ -121,7 +121,7 @@ class KvV1(VaultApiBase):
             )
             raise exceptions.ParamValidationError(error_message)
 
-    def delete_secret(self, path, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_secret(self, path, mount_point=DEFAULT_MOUNT_POINT):
         """Delete the secret at the specified location.
 
         Supported methods:
@@ -134,11 +134,11 @@ class KvV1(VaultApiBase):
         :param mount_point: The "path" the secret engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the delete_secret request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/{path}", mount_point=mount_point, path=path
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )

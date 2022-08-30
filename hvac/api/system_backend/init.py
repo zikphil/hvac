@@ -3,7 +3,7 @@ from hvac.exceptions import ParamValidationError
 
 
 class Init(SystemBackendMixin):
-    def read_init_status(self):
+    async def read_init_status(self):
         """Read the initialization status of Vault.
 
         Supported methods:
@@ -13,20 +13,20 @@ class Init(SystemBackendMixin):
         :rtype: dict
         """
         api_path = "/v1/sys/init"
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def is_initialized(self):
+    async def is_initialized(self):
         """Determine is Vault is initialized or not.
 
         :return: True if Vault is initialized, False otherwise.
         :rtype: bool
         """
-        status = self.read_init_status()
+        status = await self.read_init_status()
         return status["initialized"]
 
-    def initialize(
+    async def initialize(
         self,
         secret_shares=5,
         secret_threshold=3,
@@ -110,7 +110,7 @@ class Init(SystemBackendMixin):
             params["recovery_pgp_keys"] = recovery_pgp_keys
 
         api_path = "/v1/sys/init"
-        return self._adapter.put(
+        return await self._adapter.put(
             url=api_path,
             json=params,
         )

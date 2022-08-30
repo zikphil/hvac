@@ -18,7 +18,7 @@ class Aws(VaultApiBase):
     Reference: https://www.vaultproject.io/api/auth/aws/index.html
     """
 
-    def configure(
+    async def configure(
         self,
         max_retries=None,
         access_key=None,
@@ -70,7 +70,7 @@ class Aws(VaultApiBase):
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
 
         params = utils.remove_nones(
@@ -87,12 +87,12 @@ class Aws(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config/client", mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_config(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
+    async def read_config(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
         """Read previously configured AWS access credentials.
 
         Supported methods:
@@ -106,12 +106,12 @@ class Aws(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config/client", mount_point=mount_point
         )
-        response = self._adapter.get(
+        response = await self._adapter.get(
             url=api_path,
         )
         return response.get("data")
 
-    def delete_config(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
+    async def delete_config(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
         """Delete previously configured AWS access credentials,
 
         Supported methods:
@@ -120,14 +120,14 @@ class Aws(VaultApiBase):
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config/client", mount_point=mount_point
         )
-        return self._adapter.delete(url=api_path)
+        return await self._adapter.delete(url=api_path)
 
-    def configure_identity_integration(
+    async def configure_identity_integration(
         self, iam_alias=None, ec2_alias=None, mount_point=AWS_DEFAULT_MOUNT_POINT
     ):
         """Configure the way that Vault interacts with the Identity store.
@@ -179,12 +179,12 @@ class Aws(VaultApiBase):
         api_auth = "/v1/auth/{mount_point}/config/identity".format(
             mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_auth,
             json=params,
         )
 
-    def read_identity_integration(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
+    async def read_identity_integration(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
         """Return previously configured identity integration configuration.
 
         Supported methods:
@@ -198,12 +198,12 @@ class Aws(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config/identity", mount_point=mount_point
         )
-        response = self._adapter.get(
+        response = await self._adapter.get(
             url=api_path,
         )
         return response.get("data")
 
-    def create_certificate_configuration(
+    async def create_certificate_configuration(
         self,
         cert_name,
         aws_public_cert,
@@ -245,12 +245,12 @@ class Aws(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{0}/config/certificate/{1}", mount_point, cert_name
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_certificate_configuration(
+    async def read_certificate_configuration(
         self, cert_name, mount_point=AWS_DEFAULT_MOUNT_POINT
     ):
         """Return previously configured AWS public key.
@@ -267,12 +267,12 @@ class Aws(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{0}/config/certificate/{1}", mount_point, cert_name
         )
-        response = self._adapter.get(
+        response = await self._adapter.get(
             url=api_path,
         )
         return response.get("data")
 
-    def delete_certificate_configuration(
+    async def delete_certificate_configuration(
         self, cert_name, mount_point=AWS_DEFAULT_MOUNT_POINT
     ):
         """Remove previously configured AWS public key.
@@ -290,11 +290,11 @@ class Aws(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{0}/config/certificate/{1}", mount_point, cert_name
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def list_certificate_configurations(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
+    async def list_certificate_configurations(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
         """List AWS public certificates that are registered with the method.
 
         Supported methods
@@ -303,17 +303,17 @@ class Aws(VaultApiBase):
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config/certificates", mount_point=mount_point
         )
-        response = self._adapter.list(
+        response = await self._adapter.list(
             url=api_path,
         )
         return response.get("data")
 
-    def create_sts_role(
+    async def create_sts_role(
         self, account_id, sts_role, mount_point=AWS_DEFAULT_MOUNT_POINT
     ):
         """Allow the explicit association of STS roles to satellite AWS accounts (i.e. those which are not the
@@ -334,7 +334,7 @@ class Aws(VaultApiBase):
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{0}/config/sts/{1}", mount_point, account_id
@@ -343,12 +343,12 @@ class Aws(VaultApiBase):
             "account_id": account_id,
             "sts_role": sts_role,
         }
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_sts_role(self, account_id, mount_point=AWS_DEFAULT_MOUNT_POINT):
+    async def read_sts_role(self, account_id, mount_point=AWS_DEFAULT_MOUNT_POINT):
         """Return previously configured STS role.
 
         :param account_id: AWS account ID that has been previously associated with STS role.
@@ -356,47 +356,47 @@ class Aws(VaultApiBase):
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{0}/config/sts/{1}", mount_point, account_id
         )
-        response = self._adapter.get(
+        response = await self._adapter.get(
             url=api_path,
         )
         return response.get("data")
 
-    def list_sts_roles(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
+    async def list_sts_roles(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
         """List AWS Account IDs for which an STS role is registered.
 
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config/sts", mount_point=mount_point
         )
-        response = self._adapter.list(url=api_path)
+        response = await self._adapter.list(url=api_path)
         return response.get("data")
 
-    def delete_sts_role(self, account_id, mount_point=AWS_DEFAULT_MOUNT_POINT):
+    async def delete_sts_role(self, account_id, mount_point=AWS_DEFAULT_MOUNT_POINT):
         """Delete a previously configured AWS account/STS role association.
 
         :param account_id:
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{0}/config/sts/{1}", mount_point, account_id
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def configure_identity_whitelist_tidy(
+    async def configure_identity_whitelist_tidy(
         self,
         safety_buffer=None,
         disable_periodic_tidy=None,
@@ -412,7 +412,7 @@ class Aws(VaultApiBase):
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config/tidy/identity-whitelist",
@@ -424,43 +424,43 @@ class Aws(VaultApiBase):
                 "disable_periodic_tidy": disable_periodic_tidy,
             }
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_identity_whitelist_tidy(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
+    async def read_identity_whitelist_tidy(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
         """Read previously configured periodic whitelist tidying settings.
 
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config/tidy/identity-whitelist",
             mount_point=mount_point,
         )
-        response = self._adapter.get(url=api_path)
+        response = await self._adapter.get(url=api_path)
         return response.get("data")
 
-    def delete_identity_whitelist_tidy(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
+    async def delete_identity_whitelist_tidy(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
         """Delete previously configured periodic whitelist tidying settings.
 
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config/tidy/identity-whitelist",
             mount_point=mount_point,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def configure_role_tag_blacklist_tidy(
+    async def configure_role_tag_blacklist_tidy(
         self,
         safety_buffer=None,
         disable_periodic_tidy=None,
@@ -476,7 +476,7 @@ class Aws(VaultApiBase):
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config/tidy/roletag-blacklist",
@@ -488,41 +488,41 @@ class Aws(VaultApiBase):
                 "disable_periodic_tidy": disable_periodic_tidy,
             }
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_role_tag_blacklist_tidy(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
+    async def read_role_tag_blacklist_tidy(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
         """Read previously configured periodic blacklist tidying settings.
 
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config/tidy/roletag-blacklist",
             mount_point=mount_point,
         )
-        response = self._adapter.get(url=api_path)
+        response = await self._adapter.get(url=api_path)
         return response.get("data")
 
-    def delete_role_tag_blacklist_tidy(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
+    async def delete_role_tag_blacklist_tidy(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
         """Delete previously configured periodic blacklist tidying settings.
 
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config/tidy/roletag-blacklist",
             mount_point=mount_point,
         )
-        return self._adapter.delete(url=api_path)
+        return await self._adapter.delete(url=api_path)
 
-    def create_role(
+    async def create_role(
         self,
         role,
         auth_type=None,
@@ -573,7 +573,7 @@ class Aws(VaultApiBase):
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url("/v1/auth/{0}/role/{1}", mount_point, role)
         params = {
@@ -605,55 +605,55 @@ class Aws(VaultApiBase):
                 }
             )
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_role(self, role, mount_point=AWS_DEFAULT_MOUNT_POINT):
+    async def read_role(self, role, mount_point=AWS_DEFAULT_MOUNT_POINT):
         """Returns the previously registered role configuration
 
         :param role:
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url("/v1/auth/{0}/role/{1}", mount_point, role)
-        response = self._adapter.get(url=api_path)
+        response = await self._adapter.get(url=api_path)
         return response.get("data")
 
-    def list_roles(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
+    async def list_roles(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
         """Lists all the roles that are registered with the method
 
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/roles", mount_point=mount_point
         )
-        response = self._adapter.list(
+        response = await self._adapter.list(
             url=api_path,
         )
         return response.get("data")
 
-    def delete_role(self, role, mount_point=AWS_DEFAULT_MOUNT_POINT):
+    async def delete_role(self, role, mount_point=AWS_DEFAULT_MOUNT_POINT):
         """Deletes the previously registered role
 
         :param role:
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url("/v1/auth/{0}/role/{1}", mount_point, role)
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def create_role_tags(
+    async def create_role_tags(
         self,
         role,
         policies=None,
@@ -711,12 +711,12 @@ class Aws(VaultApiBase):
             }
         )
 
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def iam_login(
+    async def iam_login(
         self,
         access_key,
         secret_key,
@@ -743,13 +743,13 @@ class Aws(VaultApiBase):
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/login", mount_point=mount_point
         )
 
-        request = aws_utils.generate_sigv4_auth_request(header_value=header_value)
+        request = aws_utils.async_generate_sigv4_auth_request(header_value=header_value)
         auth = aws_utils.SigV4Auth(access_key, secret_key, session_token, region)
         auth.add_auth(request)
 
@@ -763,13 +763,13 @@ class Aws(VaultApiBase):
             "role": role,
         }
 
-        return self._adapter.login(
+        return await self._adapter.login(
             url=api_path,
             use_token=use_token,
             json=params,
         )
 
-    def ec2_login(
+    async def ec2_login(
         self,
         pkcs7,
         nonce=None,
@@ -791,7 +791,7 @@ class Aws(VaultApiBase):
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/login", mount_point=mount_point
@@ -802,13 +802,13 @@ class Aws(VaultApiBase):
         if role:
             params["role"] = role
 
-        return self._adapter.login(
+        return await self._adapter.login(
             url=api_path,
             use_token=use_token,
             json=params,
         )
 
-    def place_role_tags_in_blacklist(
+    async def place_role_tags_in_blacklist(
         self, role_tag, mount_point=AWS_DEFAULT_MOUNT_POINT
     ):
         """Places a valid role tag in a blacklist
@@ -821,61 +821,61 @@ class Aws(VaultApiBase):
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{0}/roletag-blacklist/{1}", mount_point, role_tag
         )
-        return self._adapter.post(url=api_path)
+        return await self._adapter.post(url=api_path)
 
-    def read_role_tag_blacklist(self, role_tag, mount_point=AWS_DEFAULT_MOUNT_POINT):
+    async def read_role_tag_blacklist(self, role_tag, mount_point=AWS_DEFAULT_MOUNT_POINT):
         """Returns the blacklist entry of a previously blacklisted role tag
 
         :param role_tag:
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{0}/roletag-blacklist/{1}", mount_point, role_tag
         )
-        response = self._adapter.get(url=api_path)
+        response = await self._adapter.get(url=api_path)
         return response.get("data")
 
-    def list_blacklist_tags(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
+    async def list_blacklist_tags(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
         """Lists all the role tags that are blacklisted
 
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/roletag-blacklist", mount_point=mount_point
         )
-        response = self._adapter.list(
+        response = await self._adapter.list(
             url=api_path,
         )
         return response.get("data")
 
-    def delete_blacklist_tags(self, role_tag, mount_point=AWS_DEFAULT_MOUNT_POINT):
+    async def delete_blacklist_tags(self, role_tag, mount_point=AWS_DEFAULT_MOUNT_POINT):
         """Deletes a blacklisted role tag
 
         :param role_tag:
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{0}/roletag-blacklist/{1}", mount_point, role_tag
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def tidy_blacklist_tags(
+    async def tidy_blacklist_tags(
         self, saftey_buffer="72h", mount_point=AWS_DEFAULT_MOUNT_POINT
     ):
         """Cleans up the entries in the blacklist based on expiration time on the entry and safety_buffer
@@ -884,7 +884,7 @@ class Aws(VaultApiBase):
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/tidy/roletag-blacklist", mount_point=mount_point
@@ -892,43 +892,43 @@ class Aws(VaultApiBase):
         params = {
             "safety_buffer": saftey_buffer,
         }
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_identity_whitelist(self, instance_id, mount_point=AWS_DEFAULT_MOUNT_POINT):
+    async def read_identity_whitelist(self, instance_id, mount_point=AWS_DEFAULT_MOUNT_POINT):
         """Returns an entry in the whitelist. An entry will be created/updated by every successful login
 
         :param instance_id:
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{0}/identity-whitelist/{1}", mount_point, instance_id
         )
-        response = self._adapter.get(url=api_path)
+        response = await self._adapter.get(url=api_path)
         return response.get("data")
 
-    def list_identity_whitelist(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
+    async def list_identity_whitelist(self, mount_point=AWS_DEFAULT_MOUNT_POINT):
         """Lists all the instance IDs that are in the whitelist of successful logins
 
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/identity-whitelist", mount_point=mount_point
         )
-        response = self._adapter.list(
+        response = await self._adapter.list(
             url=api_path,
         )
         return response.get("data")
 
-    def delete_identity_whitelist_entries(
+    async def delete_identity_whitelist_entries(
         self, instance_id, mount_point=AWS_DEFAULT_MOUNT_POINT
     ):
         """Deletes a cache of the successful login from an instance
@@ -937,16 +937,16 @@ class Aws(VaultApiBase):
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{0}/identity-whitelist/{1}", mount_point, instance_id
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def tidy_identity_whitelist_entries(
+    async def tidy_identity_whitelist_entries(
         self, saftey_buffer="72h", mount_point=AWS_DEFAULT_MOUNT_POINT
     ):
         """Cleans up the entries in the whitelist based on expiration time and safety_buffer
@@ -955,7 +955,7 @@ class Aws(VaultApiBase):
         :param mount_point: The path the AWS auth method was mounted on.
         :type mount_point: str
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/tidy/identity-whitelist", mount_point=mount_point
@@ -963,4 +963,4 @@ class Aws(VaultApiBase):
         params = {
             "safety_buffer": saftey_buffer,
         }
-        return self._adapter.post(url=api_path, json=params)
+        return await self._adapter.post(url=api_path, json=params)

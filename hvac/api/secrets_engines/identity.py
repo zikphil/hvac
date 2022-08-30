@@ -17,7 +17,7 @@ class Identity(VaultApiBase):
     Reference: https://www.vaultproject.io/api/secret/identity/entity.html
     """
 
-    def create_or_update_entity(
+    async def create_or_update_entity(
         self,
         name,
         entity_id=None,
@@ -45,7 +45,7 @@ class Identity(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The JSON response for creates, the generic response object for updates, of the request.
-        :rtype: dict | requests.Response
+        :rtype: dict | aiohttp.ClientResponse
         """
         if metadata is not None and not isinstance(metadata, dict):
             error_msg = 'unsupported metadata argument provided "{arg}" ({arg_type}), required type: dict"'
@@ -65,12 +65,12 @@ class Identity(VaultApiBase):
             }
         )
         api_path = utils.format_url("/v1/{mount_point}/entity", mount_point=mount_point)
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def create_or_update_entity_by_name(
+    async def create_or_update_entity_by_name(
         self,
         name,
         metadata=None,
@@ -95,7 +95,7 @@ class Identity(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The JSON response for creates, the generic response of the request for updates.
-        :rtype: requests.Response | dict
+        :rtype: aiohttp.ClientResponse | dict
         """
         if metadata is not None and not isinstance(metadata, dict):
             error_msg = 'unsupported metadata argument provided "{arg}" ({arg_type}), required type: dict"'
@@ -117,12 +117,12 @@ class Identity(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_entity(self, entity_id, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_entity(self, entity_id, mount_point=DEFAULT_MOUNT_POINT):
         """Query an entity by its identifier.
 
         Supported methods:
@@ -140,9 +140,9 @@ class Identity(VaultApiBase):
             mount_point=mount_point,
             id=entity_id,
         )
-        return self._adapter.get(url=api_path)
+        return await self._adapter.get(url=api_path)
 
-    def read_entity_by_name(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_entity_by_name(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Query an entity by its name.
 
         Supported methods:
@@ -153,18 +153,18 @@ class Identity(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/entity/name/{name}",
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def update_entity(
+    async def update_entity(
         self,
         entity_id,
         name=None,
@@ -192,7 +192,7 @@ class Identity(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The JSON response where available, otherwise the generic response object, of the request.
-        :rtype: dict | requests.Response
+        :rtype: dict | aiohttp.ClientResponse
         """
         if metadata is not None and not isinstance(metadata, dict):
             error_msg = 'unsupported metadata argument provided "{arg}" ({arg_type}), required type: dict"'
@@ -215,12 +215,12 @@ class Identity(VaultApiBase):
             mount_point=mount_point,
             id=entity_id,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def delete_entity(self, entity_id, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_entity(self, entity_id, mount_point=DEFAULT_MOUNT_POINT):
         """Delete an entity and all its associated aliases.
 
         Supported methods:
@@ -231,18 +231,18 @@ class Identity(VaultApiBase):
         :param mount_point: The "path" the secret engine was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/entity/id/{id}",
             mount_point=mount_point,
             id=entity_id,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def delete_entity_by_name(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_entity_by_name(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Delete an entity and all its associated aliases, given the entity name.
 
         Supported methods:
@@ -253,18 +253,18 @@ class Identity(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/entity/name/{name}",
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def list_entities(self, method="LIST", mount_point=DEFAULT_MOUNT_POINT):
+    async def list_entities(self, method="LIST", mount_point=DEFAULT_MOUNT_POINT):
         """List available entities entities by their identifiers.
 
         :param method: Supported methods:
@@ -280,7 +280,7 @@ class Identity(VaultApiBase):
             api_path = utils.format_url(
                 "/v1/{mount_point}/entity/id", mount_point=mount_point
             )
-            response = self._adapter.list(
+            response = await self._adapter.list(
                 url=api_path,
             )
 
@@ -288,7 +288,7 @@ class Identity(VaultApiBase):
             api_path = utils.format_url(
                 "/v1/{mount_point}/entity/id?list=true", mount_point=mount_point
             )
-            response = self._adapter.get(
+            response = await self._adapter.get(
                 url=api_path,
             )
         else:
@@ -299,7 +299,7 @@ class Identity(VaultApiBase):
 
         return response
 
-    def list_entities_by_name(self, method="LIST", mount_point=DEFAULT_MOUNT_POINT):
+    async def list_entities_by_name(self, method="LIST", mount_point=DEFAULT_MOUNT_POINT):
         """List available entities by their names.
 
         :param method: Supported methods:
@@ -315,7 +315,7 @@ class Identity(VaultApiBase):
             api_path = utils.format_url(
                 "/v1/{mount_point}/entity/name", mount_point=mount_point
             )
-            response = self._adapter.list(
+            response = await self._adapter.list(
                 url=api_path,
             )
 
@@ -323,7 +323,7 @@ class Identity(VaultApiBase):
             api_path = utils.format_url(
                 "/v1/{mount_point}/entity/name?list=true", mount_point=mount_point
             )
-            response = self._adapter.get(
+            response = await self._adapter.get(
                 url=api_path,
             )
         else:
@@ -334,7 +334,7 @@ class Identity(VaultApiBase):
 
         return response
 
-    def merge_entities(
+    async def merge_entities(
         self, from_entity_ids, to_entity_id, force=None, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Merge many entities into one entity.
@@ -354,7 +354,7 @@ class Identity(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -366,12 +366,12 @@ class Identity(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/entity/merge", mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def create_or_update_entity_alias(
+    async def create_or_update_entity_alias(
         self,
         name,
         canonical_id,
@@ -397,7 +397,7 @@ class Identity(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -410,12 +410,12 @@ class Identity(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/entity-alias", mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_entity_alias(self, alias_id, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_entity_alias(self, alias_id, mount_point=DEFAULT_MOUNT_POINT):
         """Query the entity alias by its identifier.
 
         Supported methods:
@@ -433,11 +433,11 @@ class Identity(VaultApiBase):
             mount_point=mount_point,
             id=alias_id,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def update_entity_alias(
+    async def update_entity_alias(
         self,
         alias_id,
         name,
@@ -463,7 +463,7 @@ class Identity(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The JSON response where available, otherwise the generic response object, of the request.
-        :rtype: dict | requests.Response
+        :rtype: dict | aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -477,12 +477,12 @@ class Identity(VaultApiBase):
             mount_point=mount_point,
             id=alias_id,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def list_entity_aliases(self, method="LIST", mount_point=DEFAULT_MOUNT_POINT):
+    async def list_entity_aliases(self, method="LIST", mount_point=DEFAULT_MOUNT_POINT):
         """List available entity aliases by their identifiers.
 
         :param method: Supported methods:
@@ -499,7 +499,7 @@ class Identity(VaultApiBase):
             api_path = utils.format_url(
                 "/v1/{mount_point}/entity-alias/id", mount_point=mount_point
             )
-            response = self._adapter.list(
+            response = await self._adapter.list(
                 url=api_path,
             )
 
@@ -507,7 +507,7 @@ class Identity(VaultApiBase):
             api_path = utils.format_url(
                 "/v1/{mount_point}/entity-alias/id?list=true", mount_point=mount_point
             )
-            response = self._adapter.get(
+            response = await self._adapter.get(
                 url=api_path,
             )
         else:
@@ -518,7 +518,7 @@ class Identity(VaultApiBase):
 
         return response
 
-    def delete_entity_alias(self, alias_id, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_entity_alias(self, alias_id, mount_point=DEFAULT_MOUNT_POINT):
         """Delete a entity alias.
 
         Supported methods:
@@ -529,14 +529,14 @@ class Identity(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/entity-alias/id/{id}",
             mount_point=mount_point,
             id=alias_id,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
@@ -578,7 +578,7 @@ class Identity(VaultApiBase):
 
         return params
 
-    def create_or_update_group(
+    async def create_or_update_group(
         self,
         name,
         group_id=None,
@@ -611,7 +611,7 @@ class Identity(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The JSON response where available, otherwise the generic response object, of the request.
-        :rtype: dict | requests.Response
+        :rtype: dict | aiohttp.ClientResponse
         """
         if metadata is not None and not isinstance(metadata, dict):
             error_msg = 'unsupported metadata argument provided "{arg}" ({arg_type}), required type: dict"'
@@ -647,12 +647,12 @@ class Identity(VaultApiBase):
         )
 
         api_path = utils.format_url("/v1/{mount_point}/group", mount_point=mount_point)
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_group(self, group_id, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_group(self, group_id, mount_point=DEFAULT_MOUNT_POINT):
         """Query the group by its identifier.
 
         Supported methods:
@@ -663,18 +663,18 @@ class Identity(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/group/id/{id}",
             mount_point=mount_point,
             id=group_id,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def update_group(
+    async def update_group(
         self,
         group_id,
         name,
@@ -707,7 +707,7 @@ class Identity(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The JSON response where available, otherwise the generic response object, of the request.
-        :rtype: dict | requests.Response
+        :rtype: dict | aiohttp.ClientResponse
         """
         if metadata is not None and not isinstance(metadata, dict):
             error_msg = 'unsupported metadata argument provided "{arg}" ({arg_type}), required type: dict"'
@@ -746,12 +746,12 @@ class Identity(VaultApiBase):
             mount_point=mount_point,
             id=group_id,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def delete_group(self, group_id, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_group(self, group_id, mount_point=DEFAULT_MOUNT_POINT):
         """Delete a group.
 
         Supported methods:
@@ -762,18 +762,18 @@ class Identity(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/group/id/{id}",
             mount_point=mount_point,
             id=group_id,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def list_groups(self, method="LIST", mount_point=DEFAULT_MOUNT_POINT):
+    async def list_groups(self, method="LIST", mount_point=DEFAULT_MOUNT_POINT):
         """List available groups by their identifiers.
 
         :param method: Supported methods:
@@ -790,7 +790,7 @@ class Identity(VaultApiBase):
             api_path = utils.format_url(
                 "/v1/{mount_point}/group/id", mount_point=mount_point
             )
-            response = self._adapter.list(
+            response = await self._adapter.list(
                 url=api_path,
             )
 
@@ -798,7 +798,7 @@ class Identity(VaultApiBase):
             api_path = utils.format_url(
                 "/v1/{mount_point}/group/id?list=true", mount_point=mount_point
             )
-            response = self._adapter.get(
+            response = await self._adapter.get(
                 url=api_path,
             )
         else:
@@ -809,7 +809,7 @@ class Identity(VaultApiBase):
 
         return response
 
-    def list_groups_by_name(self, method="LIST", mount_point=DEFAULT_MOUNT_POINT):
+    async def list_groups_by_name(self, method="LIST", mount_point=DEFAULT_MOUNT_POINT):
         """List available groups by their names.
 
         :param method: Supported methods:
@@ -826,7 +826,7 @@ class Identity(VaultApiBase):
             api_path = utils.format_url(
                 "/v1/{mount_point}/group/name", mount_point=mount_point
             )
-            response = self._adapter.list(
+            response = await self._adapter.list(
                 url=api_path,
             )
 
@@ -834,7 +834,7 @@ class Identity(VaultApiBase):
             api_path = utils.format_url(
                 "/v1/{mount_point}/group/name?list=true", mount_point=mount_point
             )
-            response = self._adapter.get(
+            response = await self._adapter.get(
                 url=api_path,
             )
         else:
@@ -845,7 +845,7 @@ class Identity(VaultApiBase):
 
         return response
 
-    def create_or_update_group_by_name(
+    async def create_or_update_group_by_name(
         self,
         name,
         group_type="internal",
@@ -875,7 +875,7 @@ class Identity(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
 
         if metadata is not None and not isinstance(metadata, dict):
@@ -914,12 +914,12 @@ class Identity(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_group_by_name(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_group_by_name(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Query a group by its name.
 
         Supported methods:
@@ -937,11 +937,11 @@ class Identity(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def delete_group_by_name(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_group_by_name(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Delete a group, given its name.
 
         Supported methods:
@@ -952,18 +952,18 @@ class Identity(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/group/name/{name}",
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def create_or_update_group_alias(
+    async def create_or_update_group_alias(
         self,
         name,
         alias_id=None,
@@ -987,7 +987,7 @@ class Identity(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -1000,12 +1000,12 @@ class Identity(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/group-alias", mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def update_group_alias(
+    async def update_group_alias(
         self,
         entity_id,
         name,
@@ -1030,7 +1030,7 @@ class Identity(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -1044,12 +1044,12 @@ class Identity(VaultApiBase):
             mount_point=mount_point,
             id=entity_id,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_group_alias(self, alias_id, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_group_alias(self, alias_id, mount_point=DEFAULT_MOUNT_POINT):
         """Query the group alias by its identifier.
 
         Supported methods:
@@ -1067,11 +1067,11 @@ class Identity(VaultApiBase):
             mount_point=mount_point,
             id=alias_id,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def delete_group_alias(self, entity_id, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_group_alias(self, entity_id, mount_point=DEFAULT_MOUNT_POINT):
         """Delete a group alias.
 
         Supported methods:
@@ -1082,18 +1082,18 @@ class Identity(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/group-alias/id/{id}",
             mount_point=mount_point,
             id=entity_id,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def list_group_aliases(self, method="LIST", mount_point=DEFAULT_MOUNT_POINT):
+    async def list_group_aliases(self, method="LIST", mount_point=DEFAULT_MOUNT_POINT):
         """List available group aliases by their identifiers.
 
         :param method: Supported methods:
@@ -1110,14 +1110,14 @@ class Identity(VaultApiBase):
             api_path = utils.format_url(
                 "/v1/{mount_point}/group-alias/id", mount_point=mount_point
             )
-            response = self._adapter.list(
+            response = await self._adapter.list(
                 url=api_path,
             )
         elif method == "GET":
             api_path = utils.format_url(
                 "/v1/{mount_point}/group-alias/id?list=true", mount_point=mount_point
             )
-            response = self._adapter.get(
+            response = await self._adapter.get(
                 url=api_path,
             )
         else:
@@ -1128,7 +1128,7 @@ class Identity(VaultApiBase):
 
         return response
 
-    def lookup_entity(
+    async def lookup_entity(
         self,
         name=None,
         entity_id=None,
@@ -1172,12 +1172,12 @@ class Identity(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/lookup/entity", mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def lookup_group(
+    async def lookup_group(
         self,
         name=None,
         group_id=None,
@@ -1221,12 +1221,12 @@ class Identity(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/lookup/group", mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def configure_tokens_backend(self, issuer=None, mount_point=DEFAULT_MOUNT_POINT):
+    async def configure_tokens_backend(self, issuer=None, mount_point=DEFAULT_MOUNT_POINT):
         """Update configurations for OIDC-compliant identity tokens issued by Vault.
 
         Supported methods:
@@ -1240,7 +1240,7 @@ class Identity(VaultApiBase):
         :type mount_point: str | unicode
         :return: The a dict or the response of the configure_tokens_backend request. dict returned when messages
             are included in the response body.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -1252,12 +1252,12 @@ class Identity(VaultApiBase):
             "/v1/{mount_point}/oidc/config",
             mount_point=mount_point,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_tokens_backend_configuration(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_tokens_backend_configuration(self, mount_point=DEFAULT_MOUNT_POINT):
         """Query vault identity tokens configurations.
 
         Supported methods:
@@ -1270,11 +1270,11 @@ class Identity(VaultApiBase):
             "/v1/{mount_point}/oidc/config",
             mount_point=mount_point,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def create_named_key(
+    async def create_named_key(
         self,
         name,
         rotation_period="24h",
@@ -1320,12 +1320,12 @@ class Identity(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_named_key(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_named_key(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Query a named key and returns its configurations.
 
         Supported methods:
@@ -1343,11 +1343,11 @@ class Identity(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def delete_named_key(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_named_key(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Delete a named key.
 
         Supported methods:
@@ -1365,11 +1365,11 @@ class Identity(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def list_named_keys(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_named_keys(self, mount_point=DEFAULT_MOUNT_POINT):
         """List all named keys.
 
         Supported methods:
@@ -1384,11 +1384,11 @@ class Identity(VaultApiBase):
             "/v1/{mount_point}/oidc/key",
             mount_point=mount_point,
         )
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def rotate_named_key(self, name, verification_ttl, mount_point=DEFAULT_MOUNT_POINT):
+    async def rotate_named_key(self, name, verification_ttl, mount_point=DEFAULT_MOUNT_POINT):
         """Rotate a named key.
 
         Supported methods:
@@ -1412,12 +1412,12 @@ class Identity(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def create_or_update_role(
+    async def create_or_update_role(
         self,
         name,
         key,
@@ -1463,12 +1463,12 @@ class Identity(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Query a role and returns its configuration.
 
         Supported methods:
@@ -1486,11 +1486,11 @@ class Identity(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def delete_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Deletes a role.
 
         Supported methods:
@@ -1509,11 +1509,11 @@ class Identity(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def list_roles(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_roles(self, mount_point=DEFAULT_MOUNT_POINT):
         """
         This endpoint will list all signing keys.
 
@@ -1530,11 +1530,11 @@ class Identity(VaultApiBase):
             "/v1/{mount_point}/oidc/role",
             mount_point=mount_point,
         )
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def generate_signed_id_token(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def generate_signed_id_token(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Generate a signed ID (OIDC) token.
 
         Supported methods:
@@ -1552,11 +1552,11 @@ class Identity(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def introspect_signed_id_token(
+    async def introspect_signed_id_token(
         self, token, client_id=None, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Verify the authenticity and active state of a signed ID token.
@@ -1584,12 +1584,12 @@ class Identity(VaultApiBase):
             "/v1/{mount_point}/oidc/introspect",
             mount_point=mount_point,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_well_known_configurations(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_well_known_configurations(self, mount_point=DEFAULT_MOUNT_POINT):
         """Retrieve a set of claims about the identity tokens' configuration.
 
         The response is a compliant OpenID Provider Configuration Response.
@@ -1606,11 +1606,11 @@ class Identity(VaultApiBase):
             "/v1/{mount_point}/oidc/.well-known/openid-configuration",
             mount_point=mount_point,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def read_active_public_keys(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_active_public_keys(self, mount_point=DEFAULT_MOUNT_POINT):
         """Retrieve the public portion of named keys.
 
         Clients can use this to validate the authenticity of an identity token.
@@ -1627,6 +1627,6 @@ class Identity(VaultApiBase):
             "/v1/{mount_point}/oidc/.well-known/keys",
             mount_point=mount_point,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )

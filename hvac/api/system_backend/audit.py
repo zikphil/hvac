@@ -5,7 +5,7 @@ from hvac.api.system_backend.system_backend_mixin import SystemBackendMixin
 
 
 class Audit(SystemBackendMixin):
-    def list_enabled_audit_devices(self):
+    async def list_enabled_audit_devices(self):
         """List enabled audit devices.
 
         It does not list all available audit devices.
@@ -17,9 +17,9 @@ class Audit(SystemBackendMixin):
         :return: JSON response of the request.
         :rtype: dict
         """
-        return self._adapter.get("/v1/sys/audit")
+        return await self._adapter.get("/v1/sys/audit")
 
-    def enable_audit_device(
+    async def enable_audit_device(
         self, device_type, description=None, options=None, path=None, local=None
     ):
         """Enable a new audit device at the supplied path.
@@ -62,9 +62,9 @@ class Audit(SystemBackendMixin):
         )
 
         api_path = utils.format_url("/v1/sys/audit/{path}", path=path)
-        return self._adapter.post(url=api_path, json=params)
+        return await self._adapter.post(url=api_path, json=params)
 
-    def disable_audit_device(self, path):
+    async def disable_audit_device(self, path):
         """Disable the audit device at the given path.
 
         Supported methods:
@@ -76,11 +76,11 @@ class Audit(SystemBackendMixin):
         :rtype: requests.Response
         """
         api_path = utils.format_url("/v1/sys/audit/{path}", path=path)
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def calculate_hash(self, path, input_to_hash):
+    async def calculate_hash(self, path, input_to_hash):
         """Hash the given input data with the specified audit device's hash function and salt.
 
         This endpoint can be used to discover whether a given plaintext string (the input parameter) appears in the
@@ -101,4 +101,4 @@ class Audit(SystemBackendMixin):
         }
 
         api_path = utils.format_url("/v1/sys/audit-hash/{path}", path=path)
-        return self._adapter.post(url=api_path, json=params)
+        return await self._adapter.post(url=api_path, json=params)

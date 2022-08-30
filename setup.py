@@ -32,9 +32,9 @@ setup(
     packages=find_packages(exclude=["docs*", "tests*"]),
     python_requires=">=3.6",
     install_requires=[
-        "requests>=2.21.0",
+        "requests>=2.21.0"
     ],
     include_package_data=True,
     package_data={"hvac": ["version"]},
-    extras_require={"parser": ["pyhcl>=0.3.10"]},
+    extras_require={"parser": ["pyhcl>=0.3.10"]}
 )

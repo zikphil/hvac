@@ -16,7 +16,7 @@ class Azure(VaultApiBase):
     Reference: https://www.vaultproject.io/api/auth/azure/index.html
     """
 
-    def configure(
+    async def configure(
         self,
         tenant_id,
         resource,
@@ -47,7 +47,7 @@ class Azure(VaultApiBase):
         :param mount_point: The "path" the azure auth method was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         if environment is not None and environment not in VALID_ENVIRONMENTS:
             error_msg = 'invalid environment argument provided: "{arg}"; supported environments: "{environments}"'
@@ -73,12 +73,12 @@ class Azure(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config", mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_config(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_config(self, mount_point=DEFAULT_MOUNT_POINT):
         """Return the previously configured config, including credentials.
 
         Supported methods:
@@ -92,12 +92,12 @@ class Azure(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config", mount_point=mount_point
         )
-        response = self._adapter.get(
+        response = await self._adapter.get(
             url=api_path,
         )
         return response.get("data")
 
-    def delete_config(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_config(self, mount_point=DEFAULT_MOUNT_POINT):
         """Delete the previously configured Azure config and credentials.
 
         Supported methods:
@@ -106,16 +106,16 @@ class Azure(VaultApiBase):
         :param mount_point: The "path" the azure auth method was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config", mount_point=mount_point
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def create_role(
+    async def create_role(
         self,
         name,
         policies=None,
@@ -169,7 +169,7 @@ class Azure(VaultApiBase):
         :param mount_point: The "path" the azure auth method was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         if policies is not None:
             if not (
@@ -205,12 +205,12 @@ class Azure(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/role/{name}", mount_point=mount_point, name=name
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Read the previously registered role configuration.
 
         Supported methods:
@@ -229,12 +229,12 @@ class Azure(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        response = self._adapter.get(
+        response = await self._adapter.get(
             url=api_path,
         )
         return response.get("data")
 
-    def list_roles(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_roles(self, mount_point=DEFAULT_MOUNT_POINT):
         """List all the roles that are registered with the plugin.
 
         Supported methods:
@@ -249,10 +249,10 @@ class Azure(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/role", mount_point=mount_point
         )
-        response = self._adapter.list(url=api_path)
+        response = await self._adapter.list(url=api_path)
         return response.get("data")
 
-    def delete_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Delete the previously registered role.
 
         Supported methods:
@@ -264,18 +264,18 @@ class Azure(VaultApiBase):
         :param mount_point: The "path" the azure auth method was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/role/{name}",
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def login(
+    async def login(
         self,
         role,
         jwt,
@@ -336,7 +336,7 @@ class Azure(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/login", mount_point=mount_point
         )
-        return self._adapter.login(
+        return await self._adapter.login(
             url=api_path,
             use_token=use_token,
             json=params,

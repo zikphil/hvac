@@ -2,7 +2,7 @@ from hvac.api.system_backend.system_backend_mixin import SystemBackendMixin
 
 
 class Wrapping(SystemBackendMixin):
-    def unwrap(self, token=None):
+    async def unwrap(self, token=None):
         """Return the original response inside the given wrapping token.
 
         Unlike simply reading cubbyhole/response (which is deprecated), this endpoint provides additional validation
@@ -23,7 +23,7 @@ class Wrapping(SystemBackendMixin):
             params["token"] = token
 
         api_path = "/v1/sys/wrapping/unwrap"
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )

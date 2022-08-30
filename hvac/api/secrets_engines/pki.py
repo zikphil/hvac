@@ -12,7 +12,7 @@ class Pki(VaultApiBase):
     Reference: https://www.vaultproject.io/api/secret/pki/index.html
     """
 
-    def read_ca_certificate(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_ca_certificate(self, mount_point=DEFAULT_MOUNT_POINT):
         """Read CA Certificate.
 
         Retrieves the CA certificate in raw DER-encoded form.
@@ -26,12 +26,12 @@ class Pki(VaultApiBase):
         :rtype: str
         """
         api_path = utils.format_url("/v1/{mount_point}/ca/pem", mount_point=mount_point)
-        response = self._adapter.get(
+        response = await self._adapter.get(
             url=api_path,
         )
-        return str(response.text)
+        return await response.text()
 
-    def read_ca_certificate_chain(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_ca_certificate_chain(self, mount_point=DEFAULT_MOUNT_POINT):
         """Read CA Certificate Chain.
 
         Retrieves the CA certificate chain, including the CA in PEM format.
@@ -47,12 +47,12 @@ class Pki(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/ca_chain", mount_point=mount_point
         )
-        response = self._adapter.get(
+        response = await self._adapter.get(
             url=api_path,
         )
-        return str(response.text)
+        return await response.text()
 
-    def read_certificate(self, serial, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_certificate(self, serial, mount_point=DEFAULT_MOUNT_POINT):
         """Read Certificate.
 
         Retrieves one of a selection of certificates.
@@ -72,11 +72,11 @@ class Pki(VaultApiBase):
             mount_point=mount_point,
             serial=serial,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def list_certificates(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_certificates(self, mount_point=DEFAULT_MOUNT_POINT):
         """List Certificates.
 
         The list of the current certificates by serial number only.
@@ -90,11 +90,11 @@ class Pki(VaultApiBase):
         :rtype: dict
         """
         api_path = utils.format_url("/v1/{mount_point}/certs", mount_point=mount_point)
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def submit_ca_information(self, pem_bundle, mount_point=DEFAULT_MOUNT_POINT):
+    async def submit_ca_information(self, pem_bundle, mount_point=DEFAULT_MOUNT_POINT):
         """Submit CA Information.
 
         Submitting the CA information for the backend.
@@ -105,7 +105,7 @@ class Pki(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "pem_bundle": pem_bundle,
@@ -113,12 +113,12 @@ class Pki(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/config/ca", mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_crl_configuration(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_crl_configuration(self, mount_point=DEFAULT_MOUNT_POINT):
         """Read CRL Configuration.
 
         Getting the duration for which the generated CRL should be marked valid.
@@ -134,11 +134,11 @@ class Pki(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/config/crl", mount_point=mount_point
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def set_crl_configuration(
+    async def set_crl_configuration(
         self,
         expiry=None,
         disable=None,
@@ -157,7 +157,7 @@ class Pki(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         if extra_params is None:
             extra_params = {}
@@ -174,12 +174,12 @@ class Pki(VaultApiBase):
             )
         )
 
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_urls(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_urls(self, mount_point=DEFAULT_MOUNT_POINT):
         """Read URLs.
 
         Fetches the URLs to be encoded in generated certificates.
@@ -195,11 +195,11 @@ class Pki(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/config/urls", mount_point=mount_point
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def set_urls(self, params, mount_point=DEFAULT_MOUNT_POINT):
+    async def set_urls(self, params, mount_point=DEFAULT_MOUNT_POINT):
         """Set URLs.
 
         Setting the issuing certificate endpoints, CRL distribution points, and OCSP server endpoints that will be
@@ -212,17 +212,17 @@ class Pki(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/config/urls", mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_crl(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_crl(self, mount_point=DEFAULT_MOUNT_POINT):
         """Read CRL.
 
         Retrieves the current CRL in PEM format.
@@ -239,13 +239,13 @@ class Pki(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/crl/pem", mount_point=mount_point
         )
-        response = self._adapter.get(
+        response = await self._adapter.get(
             url=api_path,
         )
         # python2.7 uses unicode
-        return str(response.text)
+        return await response.text()
 
-    def rotate_crl(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def rotate_crl(self, mount_point=DEFAULT_MOUNT_POINT):
         """Rotate CRLs.
 
         Forces a rotation of the CRL.
@@ -261,11 +261,11 @@ class Pki(VaultApiBase):
         api_path = utils.format_url(
             "/v1/{mount_point}/crl/rotate", mount_point=mount_point
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def generate_intermediate(
+    async def generate_intermediate(
         self,
         type,
         common_name,
@@ -291,7 +291,7 @@ class Pki(VaultApiBase):
         :param wrap_ttl: Specifies response wrapping token creation with duration. IE: '15s', '20m', '25h'.
         :type wrap_ttl: str | unicode
         :return: The JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         if extra_params is None:
             extra_params = {}
@@ -304,13 +304,13 @@ class Pki(VaultApiBase):
         params = extra_params
         params["common_name"] = common_name
 
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
             wrap_ttl=wrap_ttl,
         )
 
-    def set_signed_intermediate(self, certificate, mount_point=DEFAULT_MOUNT_POINT):
+    async def set_signed_intermediate(self, certificate, mount_point=DEFAULT_MOUNT_POINT):
         """Set Signed Intermediate.
 
         Allows submitting the signed CA certificate corresponding to a private key generated via "Generate Intermediate"
@@ -323,7 +323,7 @@ class Pki(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/intermediate/set-signed",
@@ -333,12 +333,12 @@ class Pki(VaultApiBase):
         params = {}
         params["certificate"] = certificate
 
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def generate_certificate(
+    async def generate_certificate(
         self,
         name,
         common_name,
@@ -364,7 +364,7 @@ class Pki(VaultApiBase):
         :param wrap_ttl: Specifies response wrapping token creation with duration. IE: '15s', '20m', '25h'.
         :type wrap_ttl: str | unicode
         :return: The JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         if extra_params is None:
             extra_params = {}
@@ -377,13 +377,13 @@ class Pki(VaultApiBase):
         params = extra_params
         params["common_name"] = common_name
 
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
             wrap_ttl=wrap_ttl,
         )
 
-    def revoke_certificate(self, serial_number, mount_point=DEFAULT_MOUNT_POINT):
+    async def revoke_certificate(self, serial_number, mount_point=DEFAULT_MOUNT_POINT):
         """Revoke Certificate.
 
         Revokes a certificate using its serial number.
@@ -396,19 +396,19 @@ class Pki(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :name mount_point: str | unicode
         :return: The JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url("/v1/{mount_point}/revoke", mount_point=mount_point)
 
         params = {}
         params["serial_number"] = serial_number
 
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def create_or_update_role(
+    async def create_or_update_role(
         self, name, extra_params=None, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Create/Update Role.
@@ -425,7 +425,7 @@ class Pki(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :name mount_point: str | unicode
         :return: The JSON response of the request.
-        :rname: requests.Response
+        :rname: aiohttp.ClientResponse
         """
         if extra_params is None:
             extra_params = {}
@@ -438,12 +438,12 @@ class Pki(VaultApiBase):
         params = extra_params
         params["name"] = name
 
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Read Role.
 
         Queries the role definition.
@@ -463,11 +463,11 @@ class Pki(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def list_roles(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_roles(self, mount_point=DEFAULT_MOUNT_POINT):
         """List Roles.
 
         Get a list of available roles.
@@ -481,11 +481,11 @@ class Pki(VaultApiBase):
         :rtype: dict
         """
         api_path = utils.format_url("/v1/{mount_point}/roles", mount_point=mount_point)
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def delete_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Delete Role.
 
         Deletes the role definition.
@@ -498,7 +498,7 @@ class Pki(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :name mount_point: str | unicode
         :return: The JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/roles/{name}",
@@ -506,11 +506,11 @@ class Pki(VaultApiBase):
             name=name,
         )
 
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def generate_root(
+    async def generate_root(
         self,
         type,
         common_name,
@@ -536,7 +536,7 @@ class Pki(VaultApiBase):
         :param wrap_ttl: Specifies response wrapping token creation with duration. IE: '15s', '20m', '25h'.
         :type wrap_ttl: str | unicode
         :return: The JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         if extra_params is None:
             extra_params = {}
@@ -549,13 +549,13 @@ class Pki(VaultApiBase):
         params = extra_params
         params["common_name"] = common_name
 
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
             wrap_ttl=wrap_ttl,
         )
 
-    def delete_root(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_root(self, mount_point=DEFAULT_MOUNT_POINT):
         """Delete Root.
 
         Deletes the current CA key.
@@ -566,18 +566,18 @@ class Pki(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/root",
             mount_point=mount_point,
         )
 
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def sign_intermediate(
+    async def sign_intermediate(
         self, csr, common_name, extra_params=None, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Sign Intermediate.
@@ -596,7 +596,7 @@ class Pki(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         if extra_params is None:
             extra_params = {}
@@ -608,12 +608,12 @@ class Pki(VaultApiBase):
         params["csr"] = csr
         params["common_name"] = common_name
 
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def sign_self_issued(self, certificate, mount_point=DEFAULT_MOUNT_POINT):
+    async def sign_self_issued(self, certificate, mount_point=DEFAULT_MOUNT_POINT):
         """Sign Self-Issued.
 
         Sign a self-issued certificate.
@@ -626,7 +626,7 @@ class Pki(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = utils.format_url(
             "/v1/{mount_point}/root/sign-self-issued", mount_point=mount_point
@@ -635,12 +635,12 @@ class Pki(VaultApiBase):
         params = {}
         params["certificate"] = certificate
 
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def sign_certificate(
+    async def sign_certificate(
         self, name, csr, common_name, extra_params=None, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Sign Certificate.
@@ -661,7 +661,7 @@ class Pki(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         if extra_params is None:
             extra_params = {}
@@ -675,12 +675,12 @@ class Pki(VaultApiBase):
         params["csr"] = csr
         params["common_name"] = common_name
 
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def sign_verbatim(
+    async def sign_verbatim(
         self, csr, name=False, extra_params=None, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Sign Verbatim.
@@ -699,7 +699,7 @@ class Pki(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         if extra_params is None:
             extra_params = {}
@@ -716,12 +716,12 @@ class Pki(VaultApiBase):
         params = extra_params
         params["csr"] = csr
 
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def tidy(self, extra_params=None, mount_point=DEFAULT_MOUNT_POINT):
+    async def tidy(self, extra_params=None, mount_point=DEFAULT_MOUNT_POINT):
         """Tidy.
 
         Allows tidying up the storage backend and/or CRL by removing certificates that have
@@ -735,7 +735,7 @@ class Pki(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The JSON response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         if extra_params is None:
             extra_params = {}
@@ -746,7 +746,7 @@ class Pki(VaultApiBase):
 
         params = extra_params
 
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )

@@ -2,7 +2,7 @@ from hvac.api.system_backend.system_backend_mixin import SystemBackendMixin
 
 
 class Capabilities(SystemBackendMixin):
-    def get_capabilities(self, paths, token=None, accessor=None):
+    async def get_capabilities(self, paths, token=None, accessor=None):
         """Get the capabilities associated with a token.
 
         Supported methods:
@@ -37,7 +37,7 @@ class Capabilities(SystemBackendMixin):
             # https://www.vaultproject.io/api/system/capabilities-self.html
             api_path = "/v1/sys/capabilities-self"
 
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )

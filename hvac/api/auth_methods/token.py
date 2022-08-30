@@ -12,7 +12,7 @@ class Token(VaultApiBase):
     Reference: http://localhost:3000/api-docs/auth/token
     """
 
-    def create(
+    async def create(
         self,
         id=None,
         role_name=None,
@@ -91,7 +91,7 @@ class Token(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the create request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -116,19 +116,19 @@ class Token(VaultApiBase):
                 mount_point=mount_point,
                 role_name=role_name,
             )
-            return self._adapter.post(
+            return await self._adapter.post(
                 url=api_path,
                 json=params,
             )
 
         api_path = f"/v1/auth/{mount_point}/create"
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
             wrap_ttl=wrap_ttl,
         )
 
-    def list_accessors(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_accessors(self, mount_point=DEFAULT_MOUNT_POINT):
         """List token accessors.
 
         This requires sudo capability, and access to it should be tightly controlled
@@ -140,14 +140,14 @@ class Token(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the list_accessors request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = f"/v1/auth/{mount_point}/accessors"
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def lookup(self, token, mount_point=DEFAULT_MOUNT_POINT):
+    async def lookup(self, token, mount_point=DEFAULT_MOUNT_POINT):
         """Retrieve information about the client token.
 
         Supported methods:
@@ -158,18 +158,18 @@ class Token(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the lookup_a request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "token": token,
         }
         api_path = f"/v1/auth/{mount_point}/lookup"
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def lookup_self(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def lookup_self(self, mount_point=DEFAULT_MOUNT_POINT):
         """Retrieve information about the current client token.
 
         Supported methods:
@@ -178,14 +178,14 @@ class Token(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the lookup_a_self request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = f"/v1/auth/{mount_point}/lookup-self"
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def lookup_accessor(self, accessor, mount_point=DEFAULT_MOUNT_POINT):
+    async def lookup_accessor(self, accessor, mount_point=DEFAULT_MOUNT_POINT):
         """Retrieve information about the client token from its accessor.
 
         Supported methods:
@@ -196,7 +196,7 @@ class Token(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the lookup_accessor request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "accessor": accessor,
@@ -204,12 +204,12 @@ class Token(VaultApiBase):
         api_path = "/v1/auth/{mount_point}/lookup-accessor".format(
             mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def renew(
+    async def renew(
         self, token, increment=None, wrap_ttl=None, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Renew a lease associated with a token.
@@ -230,7 +230,7 @@ class Token(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the renew_a request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -239,13 +239,13 @@ class Token(VaultApiBase):
             }
         )
         api_path = f"/v1/auth/{mount_point}/renew"
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
             wrap_ttl=wrap_ttl,
         )
 
-    def renew_self(
+    async def renew_self(
         self, increment=None, wrap_ttl=None, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Renew a lease associated with the calling token.
@@ -264,7 +264,7 @@ class Token(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the renew_a_self request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -272,13 +272,13 @@ class Token(VaultApiBase):
             }
         )
         api_path = f"/v1/auth/{mount_point}/renew-self"
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
             wrap_ttl=wrap_ttl,
         )
 
-    def renew_accessor(
+    async def renew_accessor(
         self, accessor, increment=None, wrap_ttl=None, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Renew a lease associated with a token using its accessor.
@@ -300,7 +300,7 @@ class Token(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the renew_a_accessor request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -311,13 +311,13 @@ class Token(VaultApiBase):
         api_path = "/v1/auth/{mount_point}/renew-accessor".format(
             mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
             wrap_ttl=wrap_ttl,
         )
 
-    def revoke(self, token, mount_point=DEFAULT_MOUNT_POINT):
+    async def revoke(self, token, mount_point=DEFAULT_MOUNT_POINT):
         """Revoke a token and all child tokens.
 
         When the token is revoked, all dynamic secrets generated with it are also revoked.
@@ -330,18 +330,18 @@ class Token(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the revoke_a request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "token": token,
         }
         api_path = f"/v1/auth/{mount_point}/revoke"
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def revoke_self(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def revoke_self(self, mount_point=DEFAULT_MOUNT_POINT):
         """Revoke the token used to call it and all child tokens.
 
         When the token is revoked, all dynamic secrets generated with it are also revoked.
@@ -352,12 +352,12 @@ class Token(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the revoke_a_self request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = f"/v1/auth/{mount_point}/revoke-self"
-        return self._adapter.post(url=api_path)
+        return await self._adapter.post(url=api_path)
 
-    def revoke_accessor(self, accessor, mount_point=DEFAULT_MOUNT_POINT):
+    async def revoke_accessor(self, accessor, mount_point=DEFAULT_MOUNT_POINT):
         """Revoke the token associated with the accessor and all the child tokens.
 
         This is meant for purposes where there is no access to token ID but there is need to
@@ -371,7 +371,7 @@ class Token(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the revoke_a_accessor request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "accessor": accessor,
@@ -379,12 +379,12 @@ class Token(VaultApiBase):
         api_path = "/v1/auth/{mount_point}/revoke-accessor".format(
             mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def revoke_and_orphan_children(self, token, mount_point=DEFAULT_MOUNT_POINT):
+    async def revoke_and_orphan_children(self, token, mount_point=DEFAULT_MOUNT_POINT):
         """Revoke a token but not its child tokens.
 
         When the token is revoked, all secrets generated with it are also revoked.
@@ -399,7 +399,7 @@ class Token(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the revoke_and_orphan_children request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "token": token,
@@ -407,12 +407,12 @@ class Token(VaultApiBase):
         api_path = "/v1/auth/{mount_point}/revoke-orphan".format(
             mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_role(self, role_name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_role(self, role_name, mount_point=DEFAULT_MOUNT_POINT):
         """Read the named role configuration.
 
         Supported methods:
@@ -423,17 +423,17 @@ class Token(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the read_role request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = "/v1/auth/{mount_point}/roles/{role_name}".format(
             mount_point=mount_point,
             role_name=role_name,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def list_roles(
+    async def list_roles(
         self,
         mount_point=DEFAULT_MOUNT_POINT,
     ):
@@ -445,14 +445,14 @@ class Token(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the list_roles request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = f"/v1/auth/{mount_point}/roles"
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def create_or_update_role(
+    async def create_or_update_role(
         self,
         role_name,
         allowed_policies=None,
@@ -495,7 +495,7 @@ class Token(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the create_or_update_role request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -511,12 +511,12 @@ class Token(VaultApiBase):
             mount_point=mount_point,
             role_name=role_name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def delete_role(self, role_name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_role(self, role_name, mount_point=DEFAULT_MOUNT_POINT):
         """Delete the named token role.
 
         Supported methods:
@@ -527,17 +527,17 @@ class Token(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the delete_role request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = "/v1/auth/{mount_point}/roles/{role_name}".format(
             mount_point=mount_point,
             role_name=role_name,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
         )
 
-    def tidy(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def tidy(self, mount_point=DEFAULT_MOUNT_POINT):
         """Perform some maintenance tasks to clean up invalid entries that may remain in the token store.
 
         On Enterprise, Tidy will only impact the tokens in the specified namespace, or the root namespace if unspecified.
@@ -548,9 +548,9 @@ class Token(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str
         :return: The response of the tidy_s request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         api_path = f"/v1/auth/{mount_point}/tidy"
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
         )

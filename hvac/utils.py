@@ -342,11 +342,6 @@ def format_url(format_str, *args, **kwargs):
 
     :param format_str: The URL containing replacement fields.
     :type format_str: str
-    :param kwargs: Positional replacement field values.
-    :type kwargs: list
-    :param kwargs: Named replacement field values.
-    :type kwargs: dict
-    :return: The formatted URL path with escaped replacement fields.
     :rtype: str
     """
 

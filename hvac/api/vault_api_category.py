@@ -15,8 +15,8 @@ class VaultApiCategory(VaultApiBase):
     def __init__(self, adapter):
         """API Category class constructor.
 
-        :param adapter: Instance of :py:class:`hvac.adapters.Adapter`; used for performing HTTP requests.
-        :type adapter: hvac.adapters.Adapter
+        :param adapter: Instance of :py:class:`hvac.async_adapters.AsyncAdapter`; used for performing HTTP requests.
+        :type adapter: hvac.async_adapters.AsyncAdapter
         """
         self._adapter = adapter
         self.implemented_class_names = []
@@ -50,7 +50,7 @@ class VaultApiCategory(VaultApiBase):
         """Retrieve the adapter instance under the "_adapter" property in use by this class.
 
         :return: The adapter instance in use by this class.
-        :rtype: hvac.adapters.Adapter
+        :rtype: hvac.async_adapters.AsyncAdapter
         """
         return self._adapter
 
@@ -61,7 +61,7 @@ class VaultApiCategory(VaultApiBase):
         Also sets the adapter property for all implemented classes under this category.
 
         :param adapter: New adapter instance to set for this class and all implemented classes under this category.
-        :type adapter: hvac.adapters.Adapter
+        :type adapter: hvac.async_adapters.AsyncAdapter
         """
         self._adapter = adapter
         for implemented_class in self.implemented_classes:

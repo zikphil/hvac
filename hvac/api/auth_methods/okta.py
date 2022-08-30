@@ -12,7 +12,7 @@ class Okta(VaultApiBase):
     Reference: https://www.vaultproject.io/api/auth/okta/index.html
     """
 
-    def configure(
+    async def configure(
         self,
         org_name,
         api_token=None,
@@ -48,7 +48,7 @@ class Okta(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "org_name": org_name,
@@ -67,12 +67,12 @@ class Okta(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config", mount_point=mount_point
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_config(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_config(self, mount_point=DEFAULT_MOUNT_POINT):
         """Read the Okta configuration.
 
         Supported methods:
@@ -86,11 +86,11 @@ class Okta(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/config", mount_point=mount_point
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def list_users(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_users(self, mount_point=DEFAULT_MOUNT_POINT):
         """List the users configured in the Okta method.
 
         Supported methods:
@@ -104,11 +104,11 @@ class Okta(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/users", mount_point=mount_point
         )
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def register_user(
+    async def register_user(
         self, username, groups=None, policies=None, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Register a new user and maps a set of policies to it.
@@ -125,7 +125,7 @@ class Okta(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "username": username,
@@ -143,12 +143,12 @@ class Okta(VaultApiBase):
             mount_point=mount_point,
             username=username,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_user(self, username, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_user(self, username, mount_point=DEFAULT_MOUNT_POINT):
         """Read the properties of an existing username.
 
         Supported methods:
@@ -169,12 +169,12 @@ class Okta(VaultApiBase):
             mount_point=mount_point,
             username=username,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
             json=params,
         )
 
-    def delete_user(self, username, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_user(self, username, mount_point=DEFAULT_MOUNT_POINT):
         """Delete an existing username from the method.
 
         Supported methods:
@@ -185,7 +185,7 @@ class Okta(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "username": username,
@@ -195,12 +195,12 @@ class Okta(VaultApiBase):
             mount_point=mount_point,
             username=username,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
             json=params,
         )
 
-    def list_groups(self, mount_point=DEFAULT_MOUNT_POINT):
+    async def list_groups(self, mount_point=DEFAULT_MOUNT_POINT):
         """List the groups configured in the Okta method.
 
         Supported methods:
@@ -214,11 +214,11 @@ class Okta(VaultApiBase):
         api_path = utils.format_url(
             "/v1/auth/{mount_point}/groups", mount_point=mount_point
         )
-        return self._adapter.list(
+        return await self._adapter.list(
             url=api_path,
         )
 
-    def register_group(self, name, policies=None, mount_point=DEFAULT_MOUNT_POINT):
+    async def register_group(self, name, policies=None, mount_point=DEFAULT_MOUNT_POINT):
         """Register a new group and maps a set of policies to it.
 
         Supported methods:
@@ -231,7 +231,7 @@ class Okta(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = utils.remove_nones(
             {
@@ -243,12 +243,12 @@ class Okta(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.post(
+        return await self._adapter.post(
             url=api_path,
             json=params,
         )
 
-    def read_group(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def read_group(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Read the properties of an existing group.
 
         Supported methods:
@@ -266,11 +266,11 @@ class Okta(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.get(
+        return await self._adapter.get(
             url=api_path,
         )
 
-    def delete_group(self, name, mount_point=DEFAULT_MOUNT_POINT):
+    async def delete_group(self, name, mount_point=DEFAULT_MOUNT_POINT):
         """Delete an existing group from the method.
 
         Supported methods:
@@ -281,7 +281,7 @@ class Okta(VaultApiBase):
         :param mount_point: The "path" the method/backend was mounted on.
         :type mount_point: str | unicode
         :return: The response of the request.
-        :rtype: requests.Response
+        :rtype: aiohttp.ClientResponse
         """
         params = {
             "name": name,
@@ -291,12 +291,12 @@ class Okta(VaultApiBase):
             mount_point=mount_point,
             name=name,
         )
-        return self._adapter.delete(
+        return await self._adapter.delete(
             url=api_path,
             json=params,
         )
 
-    def login(
+    async def login(
         self, username, password, use_token=True, mount_point=DEFAULT_MOUNT_POINT
     ):
         """Login with the username and password.
@@ -325,7 +325,7 @@ class Okta(VaultApiBase):
             mount_point=mount_point,
             username=username,
         )
-        return self._adapter.login(
+        return await self._adapter.login(
             url=api_path,
             use_token=use_token,
             json=params,
