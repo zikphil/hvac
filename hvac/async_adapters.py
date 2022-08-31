@@ -63,7 +63,6 @@ class AsyncAdapter:
         """
         if not session:
             session = aiohttp.ClientSession()
-            session.verify, session.proxies = verify, proxies
             self.session = session
 
         self.base_uri = base_uri
@@ -75,11 +74,7 @@ class AsyncAdapter:
         self.strict_http = strict_http
         self.request_header = request_header
 
-        self._kwargs = {
-            "verify": verify,
-            "timeout": timeout,
-            "proxies": proxies,
-        }
+        self._kwargs = {}
 
     @staticmethod
     def urljoin(*args):
