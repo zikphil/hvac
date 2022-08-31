@@ -61,24 +61,26 @@ class AsyncAdapter:
         :param request_header: If true, add the X-Vault-Request header to all requests to protect against SSRF vulnerabilities.
         :type request_header: bool
         """
-        super().__init__(
-            base_uri=base_uri,
-            token=token,
-            cert=cert,
-            verify=verify,
-            timeout=timeout,
-            proxies=proxies,
-            allow_redirects=allow_redirects,
-            session=session,
-            namespace=namespace,
-            ignore_exceptions=ignore_exceptions,
-            strict_http=strict_http,
-            request_header=request_header,
-        )
         if not session:
             session = aiohttp.ClientSession()
             session.cert, session.verify, session.proxies = cert, verify, proxies
             self.session = session
+
+        self.base_uri = base_uri
+        self.token = token
+        self.namespace = namespace
+        self.session = session
+        self.allow_redirects = allow_redirects
+        self.ignore_exceptions = ignore_exceptions
+        self.strict_http = strict_http
+        self.request_header = request_header
+
+        self._kwargs = {
+            "cert": cert,
+            "verify": verify,
+            "timeout": timeout,
+            "proxies": proxies,
+        }
 
     @staticmethod
     def urljoin(*args):
