@@ -63,6 +63,7 @@ class AsyncAdapter:
         """
         if not session:
             session = aiohttp.ClientSession()
+            session.verify, session.proxies = verify, proxies
             self.session = session
 
         self.base_uri = base_uri
@@ -75,7 +76,6 @@ class AsyncAdapter:
         self.request_header = request_header
 
         self._kwargs = {
-            "cert": cert,
             "verify": verify,
             "timeout": timeout,
             "proxies": proxies,
