@@ -200,7 +200,7 @@ class AsyncAdapter:
         response = await self.post(url, **kwargs)
 
         if use_token:
-            self.token = self.get_login_token(response)
+            self.token = await self.get_login_token(response)
 
         return response
 
