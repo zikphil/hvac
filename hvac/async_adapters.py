@@ -344,6 +344,30 @@ class JSONAsyncAdapter(RawAsyncAdapter):
         """
         return response["auth"]["client_token"]
 
+    async def login(self, url, use_token=True, **kwargs):
+        """Perform a login request.
+
+        Associated request is typically to a path prefixed with "/v1/auth") and optionally stores the client token sent
+            in the resulting Vault response for use by the :py:meth:`hvac.adapters.Adapter` instance under the _adapater
+            Client attribute.
+
+        :param url: Path to send the authentication request to.
+        :type url: str | unicode
+        :param use_token: if True, uses the token in the response received from the auth request to set the "token"
+            attribute on the :py:meth:`hvac.adapters.Adapter` instance under the _adapater Client attribute.
+        :type use_token: bool
+        :param kwargs: Additional keyword arguments to include in the params sent with the request.
+        :type kwargs: dict
+        :return: The response of the auth request.
+        :rtype: aiohttp.ClientResponse
+        """
+        response = await self.post(url, **kwargs)
+
+        if use_token:
+            self.token = self.get_login_token(response)
+
+        return response
+
     async def request(self, *args, **kwargs):
         """Main method for routing HTTP requests to the configured Vault base_uri.
 
